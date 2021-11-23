@@ -101,7 +101,7 @@ func (m *Model) onError(err error) tea.Cmd {
 func (m *Model) onFormSubmitted(entries []string) tea.Cmd {
 	log.Printf("app.onFormSubmitted -- %q", entries)
 
-	return ui.RenderDoc(entries, m.config.Renderer)
+	return ui.RenderDoc(entries)
 }
 
 func (m *Model) onDocRendered(body, bodyColored string) tea.Cmd { // nolint: unparam
@@ -119,7 +119,7 @@ func (m *Model) onDocRendered(body, bodyColored string) tea.Cmd { // nolint: unp
 func (m *Model) onDocSave(body string) tea.Cmd {
 	log.Printf("app.onDocSave -- body size: %d", len(body))
 
-	return ui.SaveDoc(body, m.config.Output)
+	return ui.WriteDoc(body, m.config.Output)
 }
 
 func (m *Model) onDocSaved() tea.Cmd {

@@ -8,14 +8,11 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/glamour"
 
 	"github.com/13k/dm/internal/config"
 	"github.com/13k/dm/internal/ui/app"
 	"github.com/13k/dm/internal/util"
 )
-
-const renderedDocWidth = 80
 
 var (
 	logPath string
@@ -59,15 +56,9 @@ func main() {
 
 	defer output.Close()
 
-	renderer, err := newRenderer(renderedDocWidth)
-	if err != nil {
-		fatal("Could not create markdown renderer: %v", err)
-	}
-
 	cfg := &config.Config{
 		Output:     output,
 		OutputPath: output.Name(),
-		Renderer:   renderer,
 	}
 
 	model := app.NewModel(cfg)
@@ -93,12 +84,4 @@ func createOutput(filename string) (*os.File, error) {
 	}
 
 	return os.Create(filename)
-}
-
-func newRenderer(width int) (*glamour.TermRenderer, error) {
-	return glamour.NewTermRenderer(
-		glamour.WithAutoStyle(),
-		glamour.WithEmoji(),
-		glamour.WithWordWrap(width),
-	)
 }
