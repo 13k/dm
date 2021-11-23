@@ -18,7 +18,8 @@ var defaultStyles = Styles{
 		Foreground(lipgloss.Color("198")),
 	FocusedText: lipgloss.NewStyle().
 		Foreground(lipgloss.Color("205")),
-	BlurredPrompt: lipgloss.NewStyle(),
+	BlurredPrompt: lipgloss.NewStyle().
+		Foreground(lipgloss.NoColor{}),
 	BlurredText: lipgloss.NewStyle().
 		Foreground(lipgloss.AdaptiveColor{
 			Light: "#909090",

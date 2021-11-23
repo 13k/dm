@@ -11,8 +11,11 @@ var (
 			Margin(1, 1, 0, 1).
 			PaddingTop(1).
 			BorderStyle(lipgloss.NormalBorder()).
-			BorderForeground(lipgloss.Color("235")).
-			BorderTop(true)
+			BorderForeground(lipgloss.AdaptiveColor{
+			Light: "#909090",
+			Dark:  "#626262",
+		}).
+		BorderTop(true)
 
 	defaultStyles = Styles{
 		SuccessFrame: lipgloss.NewStyle().
