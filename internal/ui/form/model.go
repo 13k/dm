@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 
-	"github.com/13k/dm/internal/message"
+	"github.com/13k/dm/internal/ui"
 	"github.com/13k/dm/internal/util"
 )
 
@@ -201,7 +201,7 @@ func (m *Model) submit() tea.Cmd {
 			entries[i] = val
 		}
 
-		return message.FormSubmittedMsg{Entries: entries}
+		return ui.FormSubmittedMsg{Entries: entries}
 	}
 }
 

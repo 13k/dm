@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/13k/dm/internal/document"
-	"github.com/13k/dm/internal/form"
+	"github.com/13k/dm/internal/ui/document"
+	"github.com/13k/dm/internal/ui/form"
 	"github.com/charmbracelet/lipgloss"
 )
 

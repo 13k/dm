@@ -1,10 +1,10 @@
-package message
+package ui
 
 type ErrorMsg struct {
 	Err error
 }
 
-func Error(err error) ErrorMsg {
+func NewErrorMsg(err error) ErrorMsg {
 	return ErrorMsg{Err: err}
 }
 
@@ -25,6 +25,4 @@ type SaveDocumentMsg struct {
 	Body string
 }
 
-type DocumentSavedMsg struct {
-	Filename string
-}
+type DocumentSavedMsg struct{}
