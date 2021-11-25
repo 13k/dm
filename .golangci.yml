@@ -82,8 +82,8 @@ linters-settings:
       - whyNoLint
       - wrapperFunc
 
-  # goimports:
-  #   local-prefixes: "github.com/13k/repo"
+  goimports:
+    local-prefixes: "github.com/13k/dm"
 
   gomnd:
     settings:
