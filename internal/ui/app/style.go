@@ -1,9 +1,10 @@
 package app
 
 import (
+	"github.com/charmbracelet/lipgloss"
+
 	"github.com/13k/dm/internal/ui/document"
 	"github.com/13k/dm/internal/ui/form"
-	"github.com/charmbracelet/lipgloss"
 )
 
 var (
