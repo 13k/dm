@@ -1,0 +1,114 @@
+run:
+  modules-download-mode: readonly
+
+issues:
+  new: false
+  fix: false
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - funlen
+        - gomnd
+        - nestif
+
+severity:
+  default-severity: error
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
+  uniq-by-line: true
+  sort-results: true
+
+linters:
+  enable:
+    # - gofumpt
+    - asciicheck
+    - bodyclose
+    - deadcode
+    - dogsled
+    - dupl
+    - durationcheck
+    - errcheck
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - funlen
+    - gocritic
+    - gofmt
+    - goimports
+    - gomnd
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - lll
+    - makezero
+    - nakedret
+    - nestif
+    - nilerr
+    - noctx
+    - nolintlint
+    - rowserrcheck
+    - sqlclosecheck
+    - staticcheck
+    - structcheck
+    - stylecheck
+    - testpackage
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - varcheck
+    - wsl
+
+linters-settings:
+  funlen:
+    lines: 50
+    statements: 30
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+    disabled-checks:
+      - dupImport # https://github.com/go-critic/go-critic/issues/845
+      - ifElseChain
+      - octalLiteral
+      - whyNoLint
+      - wrapperFunc
+
+  # goimports:
+  #   local-prefixes: "github.com/13k/repo"
+
+  gomnd:
+    settings:
+      mnd:
+        checks:
+          - argument
+          - case
+          - condition
+          - return
+        ignored-functions:
+          - "os.Create.*"
+          - "os.Open.*"
+
+  govet:
+    check-shadowing: true
+
+  lll:
+    line-length: 120
+    tab-width: 2
+
+  nestif:
+    min-complexity: 5
+
+  nolintlint:
+    allow-leading-space: true
+    allow-unused: false
+    require-explanation: false
+    require-specific: false
