@@ -3,6 +3,7 @@ package ui
 import (
 	"io"
 	"log"
+	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
 
@@ -11,6 +12,34 @@ import (
 
 func NoopCmd() tea.Msg {
 	return nil
+}
+
+func ParseDoc(path string) tea.Cmd {
+	log.Printf("ParseDoc() -- create command")
+
+	return func() tea.Msg {
+		f, err := os.Open(path)
+		if err != nil {
+			log.Printf("ParseDoc() -- open file error: %v", err)
+			return NewErrorMsg(err)
+		}
+
+		defer f.Close()
+
+		src, err := io.ReadAll(f)
+		if err != nil {
+			log.Printf("ParseDoc() -- read error: %v", err)
+			return NewErrorMsg(err)
+		}
+
+		var entries []string
+
+		if items := markdown.ParseList(src); len(items) >= EntriesLen {
+			entries = items[:EntriesLen]
+		}
+
+		return NewDocumentParsedMsg(entries)
+	}
 }
 
 func RenderDoc(entries []string) tea.Cmd {
@@ -36,25 +65,30 @@ func RenderDoc(entries []string) tea.Cmd {
 
 		log.Printf("RenderDoc() -- bodyColored size: %d", len(bodyColored))
 
-		return DocumentRenderedMsg{
-			Body:        body,
-			BodyColored: bodyColored,
-		}
+		return NewDocumentRenderedMsg(body, bodyColored)
 	}
 }
 
-func WriteDoc(body string, output io.Writer) tea.Cmd {
-	log.Printf("SaveDoc() -- create command")
+func WriteDoc(body, path string) tea.Cmd {
+	log.Printf("WriteDoc() -- create command")
 
 	return func() tea.Msg {
-		n, err := io.WriteString(output, body)
+		f, err := os.Create(path)
 		if err != nil {
-			log.Printf("SaveDoc() -- write error: %v", err)
+			log.Printf("WriteDoc() -- create file error: %v", err)
 			return NewErrorMsg(err)
 		}
 
-		log.Printf("SaveDoc() -- written: %d", n)
+		defer f.Close()
 
-		return DocumentSavedMsg{}
+		n, err := f.WriteString(body)
+		if err != nil {
+			log.Printf("WriteDoc() -- write error: %v", err)
+			return NewErrorMsg(err)
+		}
+
+		log.Printf("WriteDoc() -- written: %d", n)
+
+		return NewDocumentSavedMsg()
 	}
 }

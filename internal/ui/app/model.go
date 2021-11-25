@@ -13,61 +13,48 @@ import (
 	"github.com/13k/dm/internal/ui/form"
 )
 
-const (
-	stateShowForm state = iota
-	stateShowDocument
-	stateError
-	stateDocumentSaved
-)
-
-type state int
-
-func (s state) String() string {
-	switch s {
-	case stateError:
-		return "error"
-	case stateShowForm:
-		return "show-form"
-	case stateShowDocument:
-		return "show-document"
-	case stateDocumentSaved:
-		return "document-saved"
-	default:
-		return "<unkown>"
-	}
-}
-
 var _ tea.Model = Model{}
 
 type Model struct {
 	Styles Styles
 
-	config *config.Config
-	state  state
-	form   form.Model
-	doc    document.Model
-	err    error
+	cfg   *config.Config
+	state appState
+	form  form.Model
+	doc   document.Model
+	err   error
 }
 
 func NewModel(c *config.Config) Model {
 	return Model{
 		Styles: DefaultStyles(),
-		config: c,
+		cfg:    c,
 		form:   form.NewModel(),
 		doc:    document.NewModel(),
 	}
 }
 
-func (m *Model) stateChange(s state) {
-	log.Printf("app.stateChange -- %s -> %s", m.state, s)
-	m.state = s
-}
-
 func (m Model) Init() tea.Cmd { // nolint: gocritic
+	log.Printf("app.Init() -- cfg: %#+v", m.cfg)
+
 	return tea.Batch(
 		tea.EnterAltScreen,
 		m.form.Init(),
+		m.loadInput(),
 	)
+}
+
+func (m *Model) loadInput() tea.Cmd {
+	if m.cfg.InputPath == "" {
+		return nil
+	}
+
+	return ui.ParseDoc(m.cfg.InputPath)
+}
+
+func (m *Model) stateChange(s appState) {
+	log.Printf("app.stateChange -- %s -> %s", m.state, s)
+	m.state = s
 }
 
 func (m *Model) onResize(w, h int) tea.Cmd {
@@ -119,7 +106,7 @@ func (m *Model) onDocRendered(body, bodyColored string) tea.Cmd { // nolint: unp
 func (m *Model) onDocSave(body string) tea.Cmd {
 	log.Printf("app.onDocSave -- body size: %d", len(body))
 
-	return ui.WriteDoc(body, m.config.Output)
+	return ui.WriteDoc(body, m.cfg.OutputPath)
 }
 
 func (m *Model) onDocSaved() tea.Cmd {
@@ -144,15 +131,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) { // nolint: gocritic
 		cmd = m.onResize(msg.Width, msg.Height)
 	case tea.KeyMsg:
 		cmd = m.onKeyPress(msg)
-	case ui.ErrorMsg:
+	case *ui.ErrorMsg:
 		cmd = m.onError(msg.Err)
-	case ui.FormSubmittedMsg:
+	case *ui.FormSubmittedMsg:
 		cmd = m.onFormSubmitted(msg.Entries)
-	case ui.DocumentRenderedMsg:
+	case *ui.DocumentRenderedMsg:
 		cmd = m.onDocRendered(msg.Body, msg.BodyColored)
-	case ui.SaveDocumentMsg:
+	case *ui.SaveDocumentMsg:
 		cmd = m.onDocSave(msg.Body)
-	case ui.DocumentSavedMsg:
+	case *ui.DocumentSavedMsg:
 		cmd = m.onDocSaved()
 	}
 
@@ -219,7 +206,7 @@ func (m *Model) errorView() string {
 func (m *Model) successView() string {
 	var b strings.Builder
 
-	msg := fmt.Sprintf("File saved to %s", m.config.OutputPath)
+	msg := fmt.Sprintf("File saved to %s", m.cfg.OutputPath)
 
 	b.WriteString(m.Styles.Success.Render(msg))
 	b.WriteRune('\n')

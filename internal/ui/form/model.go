@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	inputsLen    = 3
 	defaultTitle = "Daily Meeting"
 	buttonText   = "submit"
 )
@@ -32,7 +31,7 @@ type inputConfig struct {
 	defaultValue string
 }
 
-var inputConfigs = make([]*inputConfig, inputsLen)
+var inputConfigs = make([]*inputConfig, ui.EntriesLen)
 
 func init() {
 	inputConfigs[idxDone] = &inputConfig{
@@ -65,7 +64,7 @@ type Model struct {
 }
 
 func NewModel() Model {
-	inputs := make([]textinput.Model, inputsLen)
+	inputs := make([]textinput.Model, ui.EntriesLen)
 
 	m := Model{
 		Title:    defaultTitle,
@@ -114,12 +113,25 @@ func (m Model) Init() tea.Cmd { // nolint: gocritic
 	)
 }
 
+func (m *Model) onDocParsed(entries []string) {
+	log.Printf("form.onDocParsed() -- entries: %q", entries)
+
+	for i := range m.inputs {
+		if len(entries) > i {
+			m.inputs[i].SetValue(entries[i])
+		}
+	}
+}
+
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) { // nolint: gocritic
 	log.Printf("form.Update() -- [%T] %v", msg, msg)
 
 	var cmd tea.Cmd
 
-	if msg, ok := msg.(tea.KeyMsg); ok {
+	switch msg := msg.(type) {
+	case *ui.DocumentParsedMsg:
+		m.onDocParsed(msg.Entries)
+	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.KeyMap.Quit):
 			return m, tea.Quit
@@ -201,7 +213,7 @@ func (m *Model) submit() tea.Cmd {
 			entries[i] = val
 		}
 
-		return ui.FormSubmittedMsg{Entries: entries}
+		return ui.NewFormSubmittedMsg(entries)
 	}
 }
 

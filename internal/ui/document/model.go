@@ -44,7 +44,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) { // nolint: gocritic
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
-	case ui.DocumentRenderedMsg:
+	case *ui.DocumentRenderedMsg:
 		m.body = msg.Body
 		m.bodyFmt = msg.BodyColored
 	case tea.KeyMsg:
@@ -61,7 +61,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) { // nolint: gocritic
 
 func (m *Model) save() tea.Cmd {
 	return func() tea.Msg {
-		return ui.SaveDocumentMsg{Body: m.body}
+		return ui.NewSaveDocumentMsg(m.body)
 	}
 }
 
