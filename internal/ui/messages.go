@@ -39,6 +39,20 @@ func NewDocumentRenderedMsg(body, bodyColored string) *DocumentRenderedMsg {
 	return &DocumentRenderedMsg{Body: body, BodyColored: bodyColored}
 }
 
+type ClipboardDocumentMsg struct {
+	Body string
+}
+
+func NewClipboardDocumentMsg(body string) *ClipboardDocumentMsg {
+	return &ClipboardDocumentMsg{Body: body}
+}
+
+type ClipboardWrittenMsg struct{}
+
+func NewClipboardWrittenMsg() *ClipboardWrittenMsg {
+	return &ClipboardWrittenMsg{}
+}
+
 type SaveDocumentMsg struct {
 	Body string
 }

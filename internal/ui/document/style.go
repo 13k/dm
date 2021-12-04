@@ -8,6 +8,10 @@ var defaultStyles = Styles{
 	Frame: lipgloss.NewStyle().
 		Padding(2). // nolint: gomnd
 		MarginBottom(1),
+	MessageFrame: lipgloss.NewStyle().
+		MarginTop(1),
+	Message: lipgloss.NewStyle().
+		Foreground(lipgloss.Color("32")),
 }
 
 type Styles struct {
@@ -15,6 +19,9 @@ type Styles struct {
 	Frame lipgloss.Style
 	// Body styles
 	BodyFrame lipgloss.Style
+	// Message styles
+	MessageFrame lipgloss.Style
+	Message      lipgloss.Style
 	// Help styles
 	HelpFrame lipgloss.Style
 }

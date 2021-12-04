@@ -15,9 +15,10 @@ type Model struct {
 	Styles Styles
 	KeyMap KeyMap
 
-	body    string
-	bodyFmt string
-	help    help.Model
+	body      string
+	bodyFmt   string
+	clipboard bool
+	help      help.Model
 }
 
 func NewModel() Model {
@@ -47,8 +48,12 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) { // nolint: gocritic
 	case *ui.DocumentRenderedMsg:
 		m.body = msg.Body
 		m.bodyFmt = msg.BodyColored
+	case *ui.ClipboardWrittenMsg:
+		m.clipboard = true
 	case tea.KeyMsg:
 		switch {
+		case key.Matches(msg, m.KeyMap.Clipboard):
+			cmd = m.copyToClipboard()
 		case key.Matches(msg, m.KeyMap.Save):
 			cmd = m.save()
 		case key.Matches(msg, m.KeyMap.Quit):
@@ -57,6 +62,12 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) { // nolint: gocritic
 	}
 
 	return m, cmd
+}
+
+func (m *Model) copyToClipboard() tea.Cmd {
+	return func() tea.Msg {
+		return ui.NewClipboardDocumentMsg(m.body)
+	}
 }
 
 func (m *Model) save() tea.Cmd {
@@ -70,6 +81,8 @@ func (m Model) View() string { // nolint: gocritic
 
 	b.WriteString(m.bodyView())
 	b.WriteRune('\n')
+	b.WriteString(m.messageView())
+	b.WriteRune('\n')
 	b.WriteString(m.helpView())
 
 	return m.Styles.Frame.Render(b.String())
@@ -77,6 +90,16 @@ func (m Model) View() string { // nolint: gocritic
 
 func (m *Model) bodyView() string {
 	return m.Styles.BodyFrame.Render(m.bodyFmt)
+}
+
+func (m *Model) messageView() string {
+	if !m.clipboard {
+		return ""
+	}
+
+	msg := m.Styles.Message.Render("📋 copied to the clipboard")
+
+	return m.Styles.MessageFrame.Render(msg)
 }
 
 func (m *Model) helpView() string {

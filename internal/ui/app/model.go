@@ -103,6 +103,12 @@ func (m *Model) onDocRendered(body, bodyColored string) tea.Cmd { // nolint: unp
 	return nil
 }
 
+func (m *Model) onDocClipboard(body string) tea.Cmd {
+	log.Printf("app.onDocClipboard -- body size: %d", len(body))
+
+	return ui.ClipboardDoc(body)
+}
+
 func (m *Model) onDocSave(body string) tea.Cmd {
 	log.Printf("app.onDocSave -- body size: %d", len(body))
 
@@ -137,6 +143,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) { // nolint: gocritic
 		cmd = m.onFormSubmitted(msg.Entries)
 	case *ui.DocumentRenderedMsg:
 		cmd = m.onDocRendered(msg.Body, msg.BodyColored)
+	case *ui.ClipboardDocumentMsg:
+		cmd = m.onDocClipboard(msg.Body)
 	case *ui.SaveDocumentMsg:
 		cmd = m.onDocSave(msg.Body)
 	case *ui.DocumentSavedMsg:

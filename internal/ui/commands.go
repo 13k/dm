@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/atotto/clipboard"
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/13k/dm/internal/markdown"
@@ -66,6 +67,21 @@ func RenderDoc(entries []string) tea.Cmd {
 		log.Printf("RenderDoc() -- bodyColored size: %d", len(bodyColored))
 
 		return NewDocumentRenderedMsg(body, bodyColored)
+	}
+}
+
+func ClipboardDoc(body string) tea.Cmd {
+	log.Printf("ClipboardDoc() -- create command")
+
+	return func() tea.Msg {
+		err := clipboard.WriteAll(body)
+
+		if err != nil {
+			log.Printf("ClipboardDoc() -- clipboard write error: %v", err)
+			return NewErrorMsg(err)
+		}
+
+		return NewClipboardWrittenMsg()
 	}
 }
 
