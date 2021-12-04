@@ -9,24 +9,15 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 
-	"github.com/13k/dm/internal/config"
 	"github.com/13k/dm/internal/meta"
 	"github.com/13k/dm/internal/ui/app"
 	"github.com/13k/dm/internal/util"
 )
 
 var (
-	cwd     string
-	rawOpts rawOptions
+	cwd  string
+	opts options
 )
-
-type rawOptions struct {
-	logPath    string
-	basePath   string
-	outputPath string
-	latest     bool
-	latestMode string
-}
 
 func init() {
 	var err error
@@ -45,7 +36,7 @@ func onInit() {
 }
 
 func configureLogger() {
-	logPath := rawOpts.logPath
+	logPath := opts.logPath
 
 	if logPath == "" {
 		logPath = os.DevNull
@@ -76,48 +67,48 @@ func rootCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(
-		&rawOpts.logPath,
+		&opts.logPath,
 		"log", "L", "",
 		`log file`,
 	)
 	cmd.Flags().StringVarP(
-		&rawOpts.basePath,
+		&opts.basePath,
 		"base", "b", "",
 		`base file from which to load initial notes ("-" reads from stdin)`,
 	)
 	cmd.Flags().BoolVarP(
-		&rawOpts.latest,
+		&opts.latest,
 		"latest", "l", false,
 		`use latest (lexically by filename) notes file (in the same directory as '--output') as '--base' file`,
 	)
 	cmd.Flags().StringVarP(
-		&rawOpts.latestMode,
+		&opts.latestMode,
 		"latest-mode", "m", util.LatestFileByName.String(),
 		`mode to search for '--latest' (available: "name", "modified")`,
 	)
 	cmd.Flags().StringVarP(
-		&rawOpts.outputPath,
+		&opts.outputPath,
 		"output", "o", defaultOutputPath(),
 		`output file`,
+	)
+	cmd.Flags().StringVarP(
+		&opts.slackChannel,
+		"slack", "s", "",
+		`slack channel to publish notes`,
 	)
 
 	return cmd
 }
 
 func run(cmd *cobra.Command, args []string) error {
-	log.Printf("rootCmd.run() -- rawOpts: %#+v", rawOpts)
+	log.Printf("rootCmd.run() -- opts: %#+v", opts)
 
-	opts, err := newOptions(&rawOpts)
+	cfg, err := parseOptions(&opts)
 	if err != nil {
 		return fmt.Errorf("options error: %w", err)
 	}
 
 	log.Printf("rootCmd.run() -- opts: %#+v", opts)
-
-	cfg := &config.Config{
-		InputPath:  opts.inputPath,
-		OutputPath: opts.outputPath,
-	}
 
 	model := app.NewModel(cfg)
 

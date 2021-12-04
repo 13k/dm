@@ -4,47 +4,54 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/13k/dm/internal/config"
 	"github.com/13k/dm/internal/markdown"
 	"github.com/13k/dm/internal/util"
 )
 
 type options struct {
-	inputPath  string
-	outputPath string
+	logPath      string
+	basePath     string
+	outputPath   string
+	latest       bool
+	latestMode   string
+	slackChannel string
 }
 
-func newOptions(raw *rawOptions) (*options, error) {
+func parseOptions(opts *options) (*config.Config, error) {
 	var err error
 
-	opts := &options{}
+	cfg := &config.Config{
+		SlackChannel: opts.slackChannel,
+	}
 
-	if raw.outputPath == "" {
+	if opts.outputPath == "" {
 		return nil, fmt.Errorf("output path cannot be empty")
 	}
 
-	if raw.basePath != "" && raw.latest {
+	if opts.basePath != "" && opts.latest {
 		return nil, fmt.Errorf("base path and latest are mutually exclusive")
 	}
 
-	opts.outputPath, err = filepath.Abs(raw.outputPath)
+	cfg.OutputPath, err = filepath.Abs(opts.outputPath)
 	if err != nil {
-		return nil, fmt.Errorf("could not determine absolute path to %q: %w", raw.outputPath, err)
+		return nil, fmt.Errorf("could not determine absolute path to %q: %w", opts.outputPath, err)
 	}
 
-	latestBy, err := util.LatestFileModeFromString(raw.latestMode)
+	latestBy, err := util.LatestFileModeFromString(opts.latestMode)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing latest file mode: %w", err)
 	}
 
-	opts.inputPath = raw.basePath
+	cfg.InputPath = opts.basePath
 
-	if opts.inputPath != "" {
-		opts.inputPath, err = filepath.Abs(opts.inputPath)
+	if cfg.InputPath != "" {
+		cfg.InputPath, err = filepath.Abs(cfg.InputPath)
 		if err != nil {
-			return nil, fmt.Errorf("could not determine absolute path to %q: %w", opts.inputPath, err)
+			return nil, fmt.Errorf("could not determine absolute path to %q: %w", cfg.InputPath, err)
 		}
-	} else if raw.latest {
-		searchDir := filepath.Dir(opts.outputPath)
+	} else if opts.latest {
+		searchDir := filepath.Dir(cfg.OutputPath)
 		latestInfo, err := util.FindLatestFile(searchDir, latestBy, markdown.Extensions)
 
 		if err != nil {
@@ -55,8 +62,8 @@ func newOptions(raw *rawOptions) (*options, error) {
 			return nil, fmt.Errorf("could not find any latest file by %s in %q", latestBy, searchDir)
 		}
 
-		opts.inputPath = filepath.Join(searchDir, latestInfo.Name())
+		cfg.InputPath = filepath.Join(searchDir, latestInfo.Name())
 	}
 
-	return opts, nil
+	return cfg, nil
 }

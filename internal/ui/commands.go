@@ -7,8 +7,14 @@ import (
 
 	"github.com/atotto/clipboard"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/slack-go/slack"
 
+	"github.com/13k/dm/internal/keyring"
 	"github.com/13k/dm/internal/markdown"
+)
+
+const (
+	slackAuthTokenKey = "slack_auth_token" //nolint:gosec
 )
 
 func NoopCmd() tea.Msg {
@@ -82,6 +88,34 @@ func ClipboardDoc(body string) tea.Cmd {
 		}
 
 		return NewClipboardWrittenMsg()
+	}
+}
+
+func PublishSlackDoc(channel, body string) tea.Cmd {
+	log.Printf("PublishSlackDoc() -- create command")
+
+	return func() tea.Msg {
+		authToken, err := keyring.Get(slackAuthTokenKey)
+
+		if err != nil {
+			log.Printf("PublishSlackDoc() -- keyring error: %v", err)
+			return NewErrorMsg(err)
+		}
+
+		client := slack.New(authToken)
+		msgOpts := []slack.MsgOption{
+			slack.MsgOptionAsUser(true),
+			slack.MsgOptionText(body, false),
+		}
+
+		resChannel, resTimestamp, err := client.PostMessage(channel, msgOpts...)
+
+		if err != nil {
+			log.Printf("PublishSlackDoc() -- slack error: %v", err)
+			return NewErrorMsg(err)
+		}
+
+		return NewPublishedSlackMsg(resChannel, resTimestamp)
 	}
 }
 

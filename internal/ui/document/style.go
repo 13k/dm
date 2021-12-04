@@ -11,7 +11,7 @@ var defaultStyles = Styles{
 	MessageFrame: lipgloss.NewStyle().
 		MarginTop(1),
 	Message: lipgloss.NewStyle().
-		Foreground(lipgloss.Color("32")),
+		Foreground(lipgloss.Color("205")),
 }
 
 type Styles struct {

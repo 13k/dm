@@ -25,12 +25,12 @@ type Model struct {
 	err   error
 }
 
-func NewModel(c *config.Config) Model {
+func NewModel(cfg *config.Config) Model {
 	return Model{
 		Styles: DefaultStyles(),
-		cfg:    c,
+		cfg:    cfg,
 		form:   form.NewModel(),
-		doc:    document.NewModel(),
+		doc:    document.NewModel(cfg),
 	}
 }
 
@@ -109,6 +109,12 @@ func (m *Model) onDocClipboard(body string) tea.Cmd {
 	return ui.ClipboardDoc(body)
 }
 
+func (m *Model) onDocSlack(channel, body string) tea.Cmd {
+	log.Printf("app.onDocSlack -- channel: %s, body size: %d", channel, len(body))
+
+	return ui.PublishSlackDoc(channel, body)
+}
+
 func (m *Model) onDocSave(body string) tea.Cmd {
 	log.Printf("app.onDocSave -- body size: %d", len(body))
 
@@ -143,8 +149,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) { // nolint: gocritic
 		cmd = m.onFormSubmitted(msg.Entries)
 	case *ui.DocumentRenderedMsg:
 		cmd = m.onDocRendered(msg.Body, msg.BodyColored)
-	case *ui.ClipboardDocumentMsg:
-		cmd = m.onDocClipboard(msg.Body)
+	case *ui.CopyToClipboardMsg:
+		cmd = m.onDocClipboard(msg.Text)
+	case *ui.PublishSlackMsg:
+		cmd = m.onDocSlack(msg.Channel, msg.Message)
 	case *ui.SaveDocumentMsg:
 		cmd = m.onDocSave(msg.Body)
 	case *ui.DocumentSavedMsg:

@@ -1,6 +1,7 @@
 package config
 
 type Config struct {
-	InputPath  string
-	OutputPath string
+	InputPath    string
+	OutputPath   string
+	SlackChannel string
 }

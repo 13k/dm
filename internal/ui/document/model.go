@@ -1,6 +1,7 @@
 package document
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -8,23 +9,33 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/13k/dm/internal/config"
 	"github.com/13k/dm/internal/ui"
+)
+
+const (
+	iconClipboard = "📋"
+	iconSlack     = "📨"
 )
 
 type Model struct {
 	Styles Styles
 	KeyMap KeyMap
 
-	body      string
-	bodyFmt   string
-	clipboard bool
-	help      help.Model
+	cfg  *config.Config
+	help help.Model
+
+	body             string
+	bodyFmt          string
+	clipboardWritten *ui.ClipboardWrittenMsg
+	slackSent        *ui.PublishedSlackMsg
 }
 
-func NewModel() Model {
+func NewModel(cfg *config.Config) Model {
 	return Model{
-		KeyMap: DefaultKeyMap(),
+		KeyMap: DefaultKeyMap().WithSlack(cfg.SlackChannel != ""),
 		Styles: DefaultStyles(),
+		cfg:    cfg,
 		help:   help.NewModel(),
 	}
 }
@@ -49,11 +60,15 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) { // nolint: gocritic
 		m.body = msg.Body
 		m.bodyFmt = msg.BodyColored
 	case *ui.ClipboardWrittenMsg:
-		m.clipboard = true
+		m.clipboardWritten = msg
+	case *ui.PublishedSlackMsg:
+		m.slackSent = msg
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.KeyMap.Clipboard):
 			cmd = m.copyToClipboard()
+		case key.Matches(msg, m.KeyMap.PublishSlack):
+			cmd = m.publishSlack()
 		case key.Matches(msg, m.KeyMap.Save):
 			cmd = m.save()
 		case key.Matches(msg, m.KeyMap.Quit):
@@ -67,6 +82,12 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) { // nolint: gocritic
 func (m *Model) copyToClipboard() tea.Cmd {
 	return func() tea.Msg {
 		return ui.NewClipboardDocumentMsg(m.body)
+	}
+}
+
+func (m *Model) publishSlack() tea.Cmd {
+	return func() tea.Msg {
+		return ui.NewPublishSlackMsg(m.cfg.SlackChannel, m.body)
 	}
 }
 
@@ -93,13 +114,36 @@ func (m *Model) bodyView() string {
 }
 
 func (m *Model) messageView() string {
-	if !m.clipboard {
-		return ""
+	var b strings.Builder
+
+	if m.clipboardWritten != nil {
+		msg := fmt.Sprintf("%s  copied to the clipboard", iconClipboard)
+
+		b.WriteString(m.Styles.Message.Render(msg))
+		b.WriteRune('\n')
 	}
 
-	msg := m.Styles.Message.Render("📋 copied to the clipboard")
+	if m.slackSent != nil {
+		msg := fmt.Sprintf(
+			"%s  sent to slack channel %s (%s)",
+			iconSlack,
+			m.slackSent.Channel,
+			m.slackSent.Timestamp,
+		)
 
-	return m.Styles.MessageFrame.Render(msg)
+		b.WriteString(m.Styles.Message.Render(msg))
+		b.WriteRune('\n')
+	}
+
+	var view string
+
+	body := b.String()
+
+	if body != "" {
+		view = m.Styles.MessageFrame.Render(body)
+	}
+
+	return view
 }
 
 func (m *Model) helpView() string {

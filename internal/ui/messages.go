@@ -39,18 +39,42 @@ func NewDocumentRenderedMsg(body, bodyColored string) *DocumentRenderedMsg {
 	return &DocumentRenderedMsg{Body: body, BodyColored: bodyColored}
 }
 
-type ClipboardDocumentMsg struct {
-	Body string
+type CopyToClipboardMsg struct {
+	Text string
 }
 
-func NewClipboardDocumentMsg(body string) *ClipboardDocumentMsg {
-	return &ClipboardDocumentMsg{Body: body}
+func NewClipboardDocumentMsg(text string) *CopyToClipboardMsg {
+	return &CopyToClipboardMsg{Text: text}
 }
 
 type ClipboardWrittenMsg struct{}
 
 func NewClipboardWrittenMsg() *ClipboardWrittenMsg {
 	return &ClipboardWrittenMsg{}
+}
+
+type PublishSlackMsg struct {
+	Channel string
+	Message string
+}
+
+func NewPublishSlackMsg(channel, msg string) *PublishSlackMsg {
+	return &PublishSlackMsg{
+		Channel: channel,
+		Message: msg,
+	}
+}
+
+type PublishedSlackMsg struct {
+	Channel   string
+	Timestamp string
+}
+
+func NewPublishedSlackMsg(channel, timestamp string) *PublishedSlackMsg {
+	return &PublishedSlackMsg{
+		Channel:   channel,
+		Timestamp: timestamp,
+	}
 }
 
 type SaveDocumentMsg struct {
