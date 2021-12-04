@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/13k/dm/internal/config"
+	"github.com/13k/dm/internal/meta"
 	"github.com/13k/dm/internal/ui/app"
 	"github.com/13k/dm/internal/util"
 )
@@ -68,6 +69,7 @@ func rootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "dm [flags] [OUTPUT]",
 		Short:         "Create daily meeting notes",
+		Version:       meta.Version,
 		RunE:          run,
 		SilenceErrors: true,
 		SilenceUsage:  true,
