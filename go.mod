@@ -11,14 +11,17 @@ require (
 	github.com/gobwas/glob v0.2.3
 	github.com/spf13/cobra v1.2.1
 	github.com/yuin/goldmark v1.4.4
+	github.com/zalando/go-keyring v0.1.1
 )
 
 require (
 	github.com/alecthomas/chroma v0.8.2 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/containerd/console v1.0.2 // indirect
+	github.com/danieljoos/wincred v1.1.0 // indirect
 	github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964 // indirect
 	github.com/dlclark/regexp2 v1.2.0 // indirect
+	github.com/godbus/dbus/v5 v5.0.4 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
