@@ -9,6 +9,7 @@ require (
 	github.com/charmbracelet/glamour v0.3.0
 	github.com/charmbracelet/lipgloss v0.4.0
 	github.com/gobwas/glob v0.2.3
+	github.com/slack-go/slack v0.10.0
 	github.com/spf13/cobra v1.2.1
 	github.com/yuin/goldmark v1.4.4
 	github.com/zalando/go-keyring v0.1.1
@@ -23,6 +24,7 @@ require (
 	github.com/dlclark/regexp2 v1.2.0 // indirect
 	github.com/godbus/dbus/v5 v5.0.4 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
+	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
