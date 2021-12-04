@@ -67,7 +67,7 @@ func defaultOutputPath() string {
 
 func rootCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:           "dm [flags] [OUTPUT]",
+		Use:           "dm [flags]",
 		Short:         "Create daily meeting notes",
 		Version:       meta.Version,
 		RunE:          run,
