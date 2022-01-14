@@ -39,7 +39,7 @@ func DefaultKeyMap() KeyMap {
 	return defaultKeyMap
 }
 
-func (k KeyMap) WithSlack(slack bool) KeyMap {
+func (k KeyMap) WithSlack(slack bool) KeyMap { // nolint: gocritic
 	k.isSlackEnabled = slack
 
 	return k
