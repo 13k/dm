@@ -3,7 +3,7 @@ package keyring
 import (
 	"github.com/zalando/go-keyring"
 
-	"github.com/13k/dm/internal/meta"
+	"github.com/13k/dm/pkg/meta"
 )
 
 func Get(key string) (string, error) {

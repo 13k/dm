@@ -9,9 +9,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 
-	"github.com/13k/dm/internal/meta"
 	"github.com/13k/dm/internal/ui/app"
 	"github.com/13k/dm/internal/util"
+	"github.com/13k/dm/pkg/meta"
 )
 
 var (
