@@ -18,6 +18,8 @@ jobs:
     strategy:
       matrix:
         go: ["1.16.x", "1.17.x"]
+    env:
+      COVERAGE_FILE: /tmp/coverage/combined.txt
     steps:
       - uses: actions/checkout@v2
 
@@ -26,12 +28,12 @@ jobs:
           go-version: ${{ matrix.go }}
 
       - name: Run test
-        run: make test COVERAGE_DIR=/tmp/coverage
+        run: go test -v -race -covermode atomic -coverprofile "$COVERAGE_FILE" ./...
 
       - name: Send goveralls coverage
         uses: shogo82148/actions-goveralls@v1
         with:
-          path-to-profile: /tmp/coverage/combined.txt
+          path-to-profile: $COVERAGE_FILE
           flag-name: Go-${{ matrix.go }}
           parallel: true
 
