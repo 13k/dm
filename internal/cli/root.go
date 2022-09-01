@@ -11,7 +11,7 @@ import (
 
 	"github.com/13k/dm/internal/ui/app"
 	"github.com/13k/dm/internal/util"
-	"github.com/13k/dm/pkg/meta"
+	"github.com/13k/dm/meta"
 )
 
 var (
