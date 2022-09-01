@@ -5,7 +5,7 @@ import (
 
 	"github.com/99designs/keyring"
 
-	"github.com/13k/dm/pkg/meta"
+	"github.com/13k/dm/meta"
 )
 
 func open() (keyring.Keyring, error) {
