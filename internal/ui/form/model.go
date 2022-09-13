@@ -241,7 +241,7 @@ func (m *Model) formView() string {
 
 func (m *Model) headerView() string {
 	title := m.Styles.Title.Render(m.Title)
-	date := m.Styles.Date.Render(util.Today())
+	date := m.Styles.Date.Render(util.TodayString())
 
 	var b strings.Builder
 
