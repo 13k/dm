@@ -34,7 +34,7 @@ func NewModel(cfg *config.Config) Model {
 	}
 }
 
-func (m Model) Init() tea.Cmd { // nolint: gocritic
+func (m Model) Init() tea.Cmd { //nolint: gocritic
 	log.Printf("app.Init() -- cfg: %#+v", m.cfg)
 
 	return tea.Batch(
@@ -91,7 +91,7 @@ func (m *Model) onFormSubmitted(entries []string) tea.Cmd {
 	return ui.RenderDoc(entries)
 }
 
-func (m *Model) onDocRendered(body, bodyColored string) tea.Cmd { // nolint: unparam
+func (m *Model) onDocRendered(body, bodyColored string) tea.Cmd { //nolint: unparam
 	log.Printf(
 		"app.onDocRendered -- body size: %d, colored body size: %d",
 		len(body),
@@ -129,7 +129,7 @@ func (m *Model) onDocSaved() tea.Cmd {
 	return ui.NoopCmd
 }
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) { // nolint: gocritic
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) { //nolint: gocritic
 	if msg == nil {
 		return m, nil
 	}
@@ -187,7 +187,7 @@ func (m *Model) updateChildren(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 }
 
-func (m Model) View() string { // nolint: gocritic
+func (m Model) View() string { //nolint: gocritic
 	switch m.state {
 	case stateShowForm:
 		m.form.Styles = m.Styles.Form

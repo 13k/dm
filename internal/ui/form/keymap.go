@@ -37,10 +37,10 @@ func DefaultKeyMap() KeyMap {
 	return defaultKeyMap
 }
 
-func (k KeyMap) ShortHelp() []key.Binding { // nolint: gocritic
+func (k KeyMap) ShortHelp() []key.Binding { //nolint: gocritic
 	return []key.Binding{k.Up, k.Down, k.Submit, k.Quit}
 }
 
-func (k KeyMap) FullHelp() [][]key.Binding { // nolint: gocritic
+func (k KeyMap) FullHelp() [][]key.Binding { //nolint: gocritic
 	return [][]key.Binding{k.ShortHelp()}
 }

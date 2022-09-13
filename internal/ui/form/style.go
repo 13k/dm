@@ -7,7 +7,7 @@ import (
 var defaultStyles = Styles{
 	Frame: lipgloss.NewStyle(),
 	HeaderFrame: lipgloss.NewStyle().
-		Margin(1, 1, 1, 3), // nolint: gomnd
+		Margin(1, 1, 1, 3), //nolint: gomnd
 	Title: lipgloss.NewStyle().
 		Foreground(lipgloss.Color("63")),
 	Date: lipgloss.NewStyle().
@@ -28,7 +28,7 @@ var defaultStyles = Styles{
 	Cursor: lipgloss.NewStyle().
 		Foreground(lipgloss.Color("205")),
 	ButtonFrame: lipgloss.NewStyle().
-		Margin(1, 1, 1, 2), // nolint: gomnd
+		Margin(1, 1, 1, 2), //nolint: gomnd
 	FocusedButton: lipgloss.NewStyle().
 		Bold(true).
 		Padding(1).

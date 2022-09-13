@@ -6,7 +6,7 @@ import (
 
 var defaultStyles = Styles{
 	Frame: lipgloss.NewStyle().
-		Padding(2). // nolint: gomnd
+		Padding(2). //nolint: gomnd
 		MarginBottom(1),
 	MessageFrame: lipgloss.NewStyle().
 		MarginTop(1),

@@ -104,7 +104,7 @@ func (m *Model) SetSize(w, _ int) {
 	m.help.Width = w
 }
 
-func (m Model) Init() tea.Cmd { // nolint: gocritic
+func (m Model) Init() tea.Cmd { //nolint: gocritic
 	log.Println("form.Init()")
 
 	return tea.Batch(
@@ -123,7 +123,7 @@ func (m *Model) onDocParsed(entries []string) {
 	}
 }
 
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) { // nolint: gocritic
+func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) { //nolint: gocritic
 	log.Printf("form.Update() -- [%T] %v", msg, msg)
 
 	var cmd tea.Cmd
@@ -217,7 +217,7 @@ func (m *Model) submit() tea.Cmd {
 	}
 }
 
-func (m Model) View() string { // nolint: gocritic
+func (m Model) View() string { //nolint: gocritic
 	var b strings.Builder
 
 	b.WriteString(m.formView())

@@ -39,13 +39,13 @@ func DefaultKeyMap() KeyMap {
 	return defaultKeyMap
 }
 
-func (k KeyMap) WithSlack(slack bool) KeyMap { // nolint: gocritic
+func (k KeyMap) WithSlack(slack bool) KeyMap { //nolint: gocritic
 	k.isSlackEnabled = slack
 
 	return k
 }
 
-func (k KeyMap) ShortHelp() []key.Binding { // nolint: gocritic
+func (k KeyMap) ShortHelp() []key.Binding { //nolint: gocritic
 	keys := []key.Binding{k.Clipboard}
 
 	if k.isSlackEnabled {
@@ -55,6 +55,6 @@ func (k KeyMap) ShortHelp() []key.Binding { // nolint: gocritic
 	return append(keys, k.Save, k.Quit)
 }
 
-func (k KeyMap) FullHelp() [][]key.Binding { // nolint: gocritic
+func (k KeyMap) FullHelp() [][]key.Binding { //nolint: gocritic
 	return [][]key.Binding{k.ShortHelp()}
 }

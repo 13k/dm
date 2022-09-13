@@ -53,7 +53,7 @@ func ParseList(src []byte) []string {
 		var itemSrc []byte
 
 		for itemChild := item.FirstChild(); itemChild != nil; itemChild = itemChild.NextSibling() {
-			switch itemChild.Kind() { //nolint:exhaustive
+			switch itemChild.Kind() {
 			case ast.KindTextBlock, ast.KindHeading:
 			default:
 				continue

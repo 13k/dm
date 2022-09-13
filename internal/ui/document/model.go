@@ -44,13 +44,13 @@ func (m *Model) SetSize(w, _ int) {
 	m.help.Width = w
 }
 
-func (m Model) Init() tea.Cmd { // nolint: gocritic
+func (m Model) Init() tea.Cmd { //nolint: gocritic
 	log.Println("document.Init()")
 
 	return nil
 }
 
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) { // nolint: gocritic
+func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) { //nolint: gocritic
 	log.Printf("document.Update() -- [%T] %v", msg, msg)
 
 	var cmd tea.Cmd
@@ -97,7 +97,7 @@ func (m *Model) save() tea.Cmd {
 	}
 }
 
-func (m Model) View() string { // nolint: gocritic
+func (m Model) View() string { //nolint: gocritic
 	var b strings.Builder
 
 	b.WriteString(m.bodyView())
