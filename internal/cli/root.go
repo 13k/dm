@@ -3,124 +3,107 @@ package cli
 import (
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
+	"github.com/13k/dm/internal/config"
 	"github.com/13k/dm/internal/ui/app"
 	"github.com/13k/dm/internal/util"
 	"github.com/13k/dm/meta"
 )
 
-var (
-	cwd  string
-	opts options
-)
-
-func init() {
-	var err error
-
-	cwd, err = os.Getwd()
-
+func must(err error) {
 	if err != nil {
-		util.Fatal("could not determine current working directory: %w", err)
+		util.Fatal("Error: %v", err)
 	}
-
-	cobra.OnInitialize(onInit)
 }
 
-func onInit() {
-	configureLogger()
-}
-
-func configureLogger() {
-	logPath := opts.logPath
-
-	if logPath == "" {
-		logPath = os.DevNull
-	}
-
-	f, err := os.OpenFile(logPath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o666)
-	if err != nil {
-		util.Fatal("could not open log file %q: %w", logPath, err)
-	}
-
-	log.SetOutput(f)
-}
-
-func defaultOutputPath() string {
-	basename := fmt.Sprintf("%s.md", util.Today())
-
-	return filepath.Join(cwd, basename)
-}
-
-func rootCmd() *cobra.Command {
+func rootCmd() *cobra.Command { //nolint:funlen
 	cmd := &cobra.Command{
-		Use:           "dm [flags]",
-		Short:         "Create daily meeting notes",
+		Use:   "dm [flags]",
+		Short: "Create daily meeting notes",
+		Long: `Create daily meeting notes.
+
+Options:
+
+If input and latest are not given, starts with an empty document.
+
+If latest is given and input is not given, input defaults to current directory.
+
+If input is a directory, latest is automatically enabled. The input file is then resolved using
+latest-method.
+
+If output is not given, it defaults to the current directory.
+
+If output is a directory, the output file is "<output>/<current_date>.md".
+		`,
 		Version:       meta.Version,
 		RunE:          run,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}
 
-	cmd.Flags().StringVarP(
-		&opts.logPath,
-		"log", "L", "",
+	cmd.Flags().StringP(
+		"log", "L",
+		"",
 		`log file`,
 	)
-	cmd.Flags().StringVarP(
-		&opts.basePath,
-		"base", "b", "",
-		`base file from which to load initial notes ("-" reads from stdin)`,
+	cmd.Flags().StringP(
+		"input", "i",
+		viper.GetString("input_path"),
+		`input file from which to load initial notes ("-" reads from stdin) or directory`,
 	)
-	cmd.Flags().BoolVarP(
-		&opts.latest,
-		"latest", "l", false,
-		`use latest (lexically by filename) notes file (in the same directory as '--output') as '--base' file`,
+	cmd.Flags().StringP(
+		"output", "o",
+		viper.GetString("output_path"),
+		`output file or directory`,
 	)
-	cmd.Flags().StringVarP(
-		&opts.latestMode,
-		"latest-mode", "m", util.LatestFileByName.String(),
-		`mode to search for '--latest' (available: "name", "modified")`,
+	cmd.Flags().BoolP(
+		"latest", "l",
+		viper.GetBool("latest"),
+		`use latest file as input file (in the same directory as input directory)`,
 	)
-	cmd.Flags().StringVarP(
-		&opts.outputPath,
-		"output", "o", defaultOutputPath(),
-		`output file`,
+	cmd.Flags().StringP(
+		"latest-mode", "m",
+		viper.GetString("latest_mode"),
+		`mode to search for latest file (available: "name", "modified")`,
 	)
-	cmd.Flags().StringVarP(
-		&opts.slackChannel,
-		"slack", "s", "",
+	cmd.Flags().StringP(
+		"slack", "s",
+		viper.GetString("slack_channel"),
 		`slack channel to publish notes`,
 	)
+
+	must(viper.BindPFlag("log_path", cmd.Flags().Lookup("log")))
+	must(viper.BindPFlag("input_path", cmd.Flags().Lookup("input")))
+	must(viper.BindPFlag("output_path", cmd.Flags().Lookup("output")))
+	must(viper.BindPFlag("latest", cmd.Flags().Lookup("latest")))
+	must(viper.BindPFlag("latest_mode", cmd.Flags().Lookup("latest-mode")))
+	must(viper.BindPFlag("slack_channel", cmd.Flags().Lookup("slack")))
 
 	return cmd
 }
 
 func run(cmd *cobra.Command, args []string) error {
-	log.Printf("rootCmd.run() -- opts: %#+v", opts)
+	cfg, err := config.New()
 
-	cfg, err := parseOptions(&opts)
 	if err != nil {
-		return fmt.Errorf("options error: %w", err)
+		return fmt.Errorf("failed to create configuration: %w", err)
 	}
 
-	log.Printf("rootCmd.run() -- opts: %#+v", opts)
+	log.Printf("rootCmd.run() -- config: %#+v", cfg)
 
 	model := app.NewModel(cfg)
 
 	if err := tea.NewProgram(model).Start(); err != nil {
-		return fmt.Errorf("could not initialize ui: %w", err)
+		return fmt.Errorf("failed to initialize ui: %w", err)
 	}
 
 	return nil
 }
 
 func Execute() {
-	if err := rootCmd().Execute(); err != nil {
-		util.Fatal("Error: %v", err)
-	}
+	must(rootCmd().Execute())
 }

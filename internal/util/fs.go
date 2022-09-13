@@ -9,9 +9,31 @@ import (
 	"strings"
 
 	"github.com/gobwas/glob"
+
+	"github.com/13k/dm/internal/markdown"
 )
 
 var fsys fs.FS = os.DirFS("/") // for testing
+
+func AbsFilepath(path string) (string, error) {
+	abspath, err := filepath.Abs(path)
+
+	if err != nil {
+		return "", fmt.Errorf("could not determine absolute path to %q: %w", path, err)
+	}
+
+	return abspath, nil
+}
+
+func IsDir(name string) (bool, error) {
+	fi, err := os.Stat(name)
+
+	if err != nil {
+		return false, fmt.Errorf("failed to get filesystem information from %q: %w", name, err)
+	}
+
+	return fi.IsDir(), nil
+}
 
 const (
 	latestFileModeLowerBound LatestFileMode = iota - 1
@@ -134,4 +156,20 @@ func sortFileInfosByLatest(infos []fs.FileInfo, mode LatestFileMode) {
 	}
 
 	sort.Sort(sortBy)
+}
+
+func SearchLatestDocumentFile(dir string, mode LatestFileMode) (string, error) {
+	latestInfo, err := FindLatestFile(dir, mode, markdown.Extensions)
+
+	if err != nil {
+		return "", fmt.Errorf("failed to find latest document file in directory %q: %w", dir, err)
+	}
+
+	if latestInfo == nil {
+		return "", fmt.Errorf("could not find any latest document file by %s in directory %q", mode, dir)
+	}
+
+	latestPath := filepath.Join(dir, latestInfo.Name())
+
+	return latestPath, nil
 }
