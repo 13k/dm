@@ -1,6 +1,6 @@
 module github.com/13k/dm
 
-go 1.17
+go 1.18
 
 require (
 	github.com/99designs/keyring v1.2.1
