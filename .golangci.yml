@@ -26,7 +26,6 @@ linters:
     # - gofumpt
     - asciicheck
     - bodyclose
-    - deadcode
     - dogsled
     - dupl
     - durationcheck
@@ -53,14 +52,12 @@ linters:
     - rowserrcheck
     - sqlclosecheck
     - staticcheck
-    - structcheck
     - stylecheck
     - testpackage
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
     - wsl
 
 linters-settings:
