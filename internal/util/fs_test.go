@@ -2,7 +2,6 @@ package util_test
 
 import (
 	"errors"
-	"fmt"
 	"io/fs"
 	"strings"
 	"testing"
@@ -74,28 +73,6 @@ func TestFindLatestFile(t *testing.T) {
 	touchFile("latest-by-name.txt", time.Now().Add(3*time.Second))
 	touchFile("latest-by-mtime.md", time.Now().Add(4*time.Second))
 	touchFile("latest-by-mtime.txt", time.Now().Add(5*time.Second))
-
-	entries, err := rootTestFS.ReadDir()
-
-	if err != nil {
-		panic(err)
-	}
-
-	for _, entry := range entries {
-		fi, err := entry.Info()
-
-		if err != nil {
-			panic(err)
-		}
-
-		eType := "f"
-
-		if fi.IsDir() {
-			eType = "d"
-		}
-
-		fmt.Printf("%30s  %s  %s\n", fi.Name(), eType, fi.ModTime())
-	}
 
 	mdExts := []string{"md", "mkd"}
 
