@@ -7,5 +7,5 @@ import (
 )
 
 func init() {
-	fsRoot = util.NewPath("/")
+	rootTestFS = util.NewPath("/")
 }
