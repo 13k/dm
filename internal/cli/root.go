@@ -14,12 +14,6 @@ import (
 	"github.com/13k/dm/meta"
 )
 
-func must(err error) {
-	if err != nil {
-		util.Fatal("Error: %v", err)
-	}
-}
-
 func rootCmd() *cobra.Command { //nolint:funlen
 	cmd := &cobra.Command{
 		Use:   "dm [flags]",
@@ -76,12 +70,12 @@ If output is a directory, the output file is "<output>/<current_date>.md".
 		`slack channel to publish notes`,
 	)
 
-	must(viper.BindPFlag("log_path", cmd.Flags().Lookup("log")))
-	must(viper.BindPFlag("input_path", cmd.Flags().Lookup("input")))
-	must(viper.BindPFlag("output_path", cmd.Flags().Lookup("output")))
-	must(viper.BindPFlag("latest", cmd.Flags().Lookup("latest")))
-	must(viper.BindPFlag("latest_mode", cmd.Flags().Lookup("latest-mode")))
-	must(viper.BindPFlag("slack_channel", cmd.Flags().Lookup("slack")))
+	util.Must(viper.BindPFlag("log_path", cmd.Flags().Lookup("log")))
+	util.Must(viper.BindPFlag("input_path", cmd.Flags().Lookup("input")))
+	util.Must(viper.BindPFlag("output_path", cmd.Flags().Lookup("output")))
+	util.Must(viper.BindPFlag("latest", cmd.Flags().Lookup("latest")))
+	util.Must(viper.BindPFlag("latest_mode", cmd.Flags().Lookup("latest-mode")))
+	util.Must(viper.BindPFlag("slack_channel", cmd.Flags().Lookup("slack")))
 
 	return cmd
 }
@@ -97,7 +91,7 @@ func run(cmd *cobra.Command, args []string) error {
 
 	model := app.NewModel(cfg)
 
-	if err := tea.NewProgram(model).Start(); err != nil {
+	if _, err := tea.NewProgram(model).Run(); err != nil {
 		return fmt.Errorf("failed to initialize ui: %w", err)
 	}
 
@@ -105,5 +99,5 @@ func run(cmd *cobra.Command, args []string) error {
 }
 
 func Execute() {
-	must(rootCmd().Execute())
+	util.Must(rootCmd().Execute())
 }

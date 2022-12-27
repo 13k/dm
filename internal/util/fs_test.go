@@ -2,6 +2,7 @@ package util_test
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
 	"strings"
 	"testing"
@@ -14,6 +15,8 @@ import (
 var (
 	actualFS = util.GetFS()
 	testFS   = fstest.MapFS{}
+
+	rootTestFS util.Path
 )
 
 func setupFS() {
@@ -28,8 +31,8 @@ func teardownFS() {
 	util.SetFS(actualFS)
 }
 
-func createFile(name string, data []byte, mode fs.FileMode, mtime time.Time) *fstest.MapFile {
-	if name == "" {
+func createFile(path util.Path, data []byte, mode fs.FileMode, mtime time.Time) *fstest.MapFile {
+	if path == "" {
 		panic(errors.New("cannot create file with empty name"))
 	}
 
@@ -47,17 +50,17 @@ func createFile(name string, data []byte, mode fs.FileMode, mtime time.Time) *fs
 		ModTime: mtime,
 	}
 
-	testFS[name] = f
+	testFS[path.String()] = f
 
 	return f
 }
 
-func createEmptyFile(name string, mode fs.FileMode, mtime time.Time) *fstest.MapFile {
-	return createFile(name, nil, mode, mtime)
+func createEmptyFile(path util.Path, mode fs.FileMode, mtime time.Time) *fstest.MapFile {
+	return createFile(path, nil, mode, mtime)
 }
 
-func touchFile(name string) *fstest.MapFile { //nolint:unparam
-	return createEmptyFile(name, 0, time.Time{})
+func touchFile(path util.Path, mtime time.Time) *fstest.MapFile { //nolint:unparam
+	return createEmptyFile(path, 0, mtime)
 }
 
 func TestFindLatestFile(t *testing.T) {
@@ -65,33 +68,55 @@ func TestFindLatestFile(t *testing.T) {
 
 	setupFS()
 
-	touchFile("dm.md")
-	touchFile("dm.mkd")
-	touchFile("latest-by-name.md")
-	touchFile("latest-by-name.txt")
-	touchFile("latest-by-mtime.md")
-	touchFile("latest-by-mtime.txt")
+	touchFile("dm.md", time.Now())
+	touchFile("dm.mkd", time.Now().Add(1*time.Second))
+	touchFile("latest-by-name.md", time.Now().Add(2*time.Second))
+	touchFile("latest-by-name.txt", time.Now().Add(3*time.Second))
+	touchFile("latest-by-mtime.md", time.Now().Add(4*time.Second))
+	touchFile("latest-by-mtime.txt", time.Now().Add(5*time.Second))
+
+	entries, err := rootTestFS.ReadDir()
+
+	if err != nil {
+		panic(err)
+	}
+
+	for _, entry := range entries {
+		fi, err := entry.Info()
+
+		if err != nil {
+			panic(err)
+		}
+
+		eType := "f"
+
+		if fi.IsDir() {
+			eType = "d"
+		}
+
+		fmt.Printf("%30s  %s  %s\n", fi.Name(), eType, fi.ModTime())
+	}
 
 	mdExts := []string{"md", "mkd"}
 
 	testCases := []struct {
-		dirname  string
+		dirname  util.Path
 		mode     util.LatestFileMode
 		exts     []string
 		expected string
 		err      string
 	}{
-		{"/", util.LatestFileMode(-1), nil, "", "invalid latest file mode"},
-		{"/", util.LatestFileMode(666), nil, "", "invalid latest file mode"},
+		{rootTestFS, util.LatestFileMode(-1), nil, "", "invalid latest file mode"},
+		{rootTestFS, util.LatestFileMode(666), nil, "", "invalid latest file mode"},
 		{"invalid", util.LatestFileByName, nil, "", "is not absolute"},
-		{"/invalid", util.LatestFileByName, nil, "", "file does not exist"},
-		{"/", util.LatestFileByName, []string{"[1-]"}, "", "pattern"},
-		{"/", util.LatestFileByModTime, []string{"invalid"}, "", ""},
-		{"/", util.LatestFileByModTime, nil, "latest-by-mtime.txt", ""},
-		{"/", util.LatestFileByModTime, mdExts, "latest-by-mtime.md", ""},
-		{"/", util.LatestFileByModTime, []string{"mkd"}, "dm.mkd", ""},
-		{"/", util.LatestFileByName, nil, "latest-by-name.txt", ""},
-		{"/", util.LatestFileByName, mdExts, "latest-by-name.md", ""},
+		{rootTestFS.Join("invalid"), util.LatestFileByName, nil, "", "file does not exist"},
+		{rootTestFS, util.LatestFileByName, []string{"[1-]"}, "", "pattern"},
+		{rootTestFS, util.LatestFileByModTime, []string{"invalid"}, "", ""},
+		{rootTestFS, util.LatestFileByModTime, nil, "latest-by-mtime.txt", ""},
+		{rootTestFS, util.LatestFileByModTime, mdExts, "latest-by-mtime.md", ""},
+		{rootTestFS, util.LatestFileByModTime, []string{"mkd"}, "dm.mkd", ""},
+		{rootTestFS, util.LatestFileByName, nil, "latest-by-name.txt", ""},
+		{rootTestFS, util.LatestFileByName, mdExts, "latest-by-name.md", ""},
 	}
 
 	for tcidx, tc := range testCases {

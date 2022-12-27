@@ -23,7 +23,7 @@ var (
 func init() {
 	defaultConfigDir = filepath.Join(xdg.ConfigHome, meta.AppName)
 	defaultOutputFilename = fmt.Sprintf("%s.md", util.TodayString())
-	defaultOutputPath = filepath.Join(util.Cwd, defaultOutputFilename)
+	defaultOutputPath = util.Cwd.String()
 
 	viper.AddConfigPath(defaultConfigDir)
 	viper.SetConfigName("config")
@@ -49,8 +49,8 @@ func LoadFile() error {
 }
 
 type Config struct {
-	InputPath    string
-	OutputPath   string
+	InputPath    util.Path
+	OutputPath   util.Path
 	Latest       bool
 	LatestMode   string
 	SlackChannel string
@@ -60,8 +60,8 @@ type Config struct {
 
 func New() (*Config, error) { //nolint: funlen
 	cfg := &Config{
-		InputPath:    viper.GetString("input_path"),
-		OutputPath:   viper.GetString("output_path"),
+		InputPath:    util.NewPath(viper.GetString("input_path")),
+		OutputPath:   util.NewPath(viper.GetString("output_path")),
 		Latest:       viper.GetBool("latest"),
 		LatestMode:   viper.GetString("latest_mode"),
 		SlackChannel: viper.GetString("slack_channel"),
@@ -86,8 +86,16 @@ func New() (*Config, error) { //nolint: funlen
 		cfg.InputPath = util.Cwd
 	}
 
-	if cfg.InputPath != "" { //nolint: nestif
-		isDir, err = util.IsDir(cfg.InputPath)
+	if cfg.InputPath != "" {
+		cfg.InputPath, err = cfg.InputPath.Abs()
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if cfg.InputPath != "" {
+		isDir, err = cfg.InputPath.IsDir()
 
 		if err != nil {
 			return nil, err
@@ -99,25 +107,19 @@ func New() (*Config, error) { //nolint: funlen
 			if err != nil {
 				return nil, err
 			}
-		} else {
-			cfg.InputPath, err = util.AbsFilepath(cfg.InputPath)
-
-			if err != nil {
-				return nil, err
-			}
 		}
 	}
 
-	isDir, err = util.IsDir(cfg.OutputPath)
+	isDir, err = cfg.OutputPath.IsDir()
 
 	if err != nil {
 		return nil, err
 	}
 
 	if isDir {
-		cfg.OutputPath = filepath.Join(cfg.OutputPath, defaultOutputFilename)
+		cfg.OutputPath = cfg.OutputPath.Join(defaultOutputFilename)
 	} else {
-		cfg.OutputPath, err = util.AbsFilepath(cfg.OutputPath)
+		cfg.OutputPath, err = cfg.OutputPath.Abs()
 
 		if err != nil {
 			return nil, err

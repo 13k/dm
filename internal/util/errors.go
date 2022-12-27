@@ -15,3 +15,9 @@ func Fatal(format string, args ...interface{}) {
 
 	os.Exit(1)
 }
+
+func Must(err error) {
+	if err != nil {
+		Fatal("Error: %v", err)
+	}
+}

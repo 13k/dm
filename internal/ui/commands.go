@@ -11,6 +11,7 @@ import (
 
 	"github.com/13k/dm/internal/keyring"
 	"github.com/13k/dm/internal/markdown"
+	"github.com/13k/dm/internal/util"
 )
 
 const (
@@ -21,11 +22,11 @@ func NoopCmd() tea.Msg {
 	return nil
 }
 
-func ParseDoc(path string) tea.Cmd {
+func ParseDoc(path util.Path) tea.Cmd {
 	log.Printf("ParseDoc() -- create command")
 
 	return func() tea.Msg {
-		f, err := os.Open(path)
+		f, err := os.Open(path.String())
 		if err != nil {
 			log.Printf("ParseDoc() -- open file error: %v", err)
 			return NewErrorMsg(err)
@@ -119,11 +120,11 @@ func PublishSlackDoc(channel, body string) tea.Cmd {
 	}
 }
 
-func WriteDoc(body, path string) tea.Cmd {
+func WriteDoc(body string, path util.Path) tea.Cmd {
 	log.Printf("WriteDoc() -- create command")
 
 	return func() tea.Msg {
-		f, err := os.Create(path)
+		f, err := os.Create(path.String())
 		if err != nil {
 			log.Printf("WriteDoc() -- create file error: %v", err)
 			return NewErrorMsg(err)

@@ -3,8 +3,6 @@ package util
 import (
 	"fmt"
 	"io/fs"
-	"os"
-	"path/filepath"
 	"sort"
 	"strings"
 
@@ -13,27 +11,7 @@ import (
 	"github.com/13k/dm/internal/markdown"
 )
 
-var fsys fs.FS = os.DirFS("/") // for testing
-
-func AbsFilepath(path string) (string, error) {
-	abspath, err := filepath.Abs(path)
-
-	if err != nil {
-		return "", fmt.Errorf("could not determine absolute path to %q: %w", path, err)
-	}
-
-	return abspath, nil
-}
-
-func IsDir(name string) (bool, error) {
-	fi, err := os.Stat(name)
-
-	if err != nil {
-		return false, fmt.Errorf("failed to get filesystem information from %q: %w", name, err)
-	}
-
-	return fi.IsDir(), nil
-}
+var testFs fs.FS // for testing
 
 const (
 	latestFileModeLowerBound LatestFileMode = iota - 1
@@ -67,12 +45,12 @@ func (m LatestFileMode) String() string {
 	return "<invalid>"
 }
 
-func FindLatestFile(dirname string, mode LatestFileMode, exts []string) (fs.FileInfo, error) {
+func FindLatestFile(dir Path, mode LatestFileMode, exts []string) (fs.FileInfo, error) {
 	if mode <= latestFileModeLowerBound || mode >= latestFileModeUpperBound {
 		return nil, fmt.Errorf("invalid latest file mode (%v)", mode)
 	}
 
-	infos, err := readDirInfos(dirname)
+	infos, err := readDirInfos(dir)
 	if err != nil {
 		return nil, err
 	}
@@ -91,19 +69,13 @@ func FindLatestFile(dirname string, mode LatestFileMode, exts []string) (fs.File
 	return infos[0], nil
 }
 
-func readDirInfos(dirname string) ([]fs.FileInfo, error) {
-	if !filepath.IsAbs(dirname) {
-		return nil, fmt.Errorf("path %q is not absolute", dirname)
+func readDirInfos(dir Path) ([]fs.FileInfo, error) {
+	if !dir.IsAbs() {
+		return nil, fmt.Errorf("dir is not absolute: %q", dir)
 	}
 
-	// trim starting "/"
-	dirname = dirname[1:]
+	entries, err := dir.ReadDir()
 
-	if dirname == "" {
-		dirname = "."
-	}
-
-	entries, err := fs.ReadDir(fsys, dirname)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +130,7 @@ func sortFileInfosByLatest(infos []fs.FileInfo, mode LatestFileMode) {
 	sort.Sort(sortBy)
 }
 
-func SearchLatestDocumentFile(dir string, mode LatestFileMode) (string, error) {
+func SearchLatestDocumentFile(dir Path, mode LatestFileMode) (Path, error) {
 	latestInfo, err := FindLatestFile(dir, mode, markdown.Extensions)
 
 	if err != nil {
@@ -169,7 +141,7 @@ func SearchLatestDocumentFile(dir string, mode LatestFileMode) (string, error) {
 		return "", fmt.Errorf("could not find any latest document file by %s in directory %q", mode, dir)
 	}
 
-	latestPath := filepath.Join(dir, latestInfo.Name())
+	latestPath := dir.Join(latestInfo.Name())
 
 	return latestPath, nil
 }

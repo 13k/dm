@@ -5,9 +5,9 @@ import (
 )
 
 func GetFS() fs.FS {
-	return fsys
+	return testFs
 }
 
-func SetFS(testFsys fs.FS) {
-	fsys = testFsys
+func SetFS(fsys fs.FS) {
+	testFs = fsys
 }

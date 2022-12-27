@@ -5,15 +5,15 @@ import (
 )
 
 var (
-	Cwd string
+	Cwd Path
 )
 
 func init() {
-	var err error
-
-	Cwd, err = os.Getwd()
+	cwd, err := os.Getwd()
 
 	if err != nil {
 		Fatal("could not determine current working directory: %w", err)
 	}
+
+	Cwd = NewPath(cwd)
 }
