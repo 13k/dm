@@ -63,7 +63,7 @@ type Model struct {
 	help     help.Model
 }
 
-func NewModel() Model {
+func New() Model {
 	inputs := make([]textinput.Model, ui.EntriesLen)
 
 	m := Model{
@@ -72,14 +72,14 @@ func NewModel() Model {
 		Styles:   DefaultStyles(),
 		inputs:   inputs,
 		focusIdx: idxDone,
-		help:     help.NewModel(),
+		help:     help.New(),
 	}
 
 	var t textinput.Model
 
 	for i := range m.inputs {
 		cfg := inputConfigs[i]
-		t = textinput.NewModel()
+		t = textinput.New()
 
 		t.CursorStyle = m.Styles.Cursor
 		t.Prompt = cfg.prompt

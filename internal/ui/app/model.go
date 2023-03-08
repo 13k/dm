@@ -25,12 +25,12 @@ type Model struct {
 	err   error
 }
 
-func NewModel(cfg *config.Config) Model {
+func New(cfg *config.Config) Model {
 	return Model{
 		Styles: DefaultStyles(),
 		cfg:    cfg,
-		form:   form.NewModel(),
-		doc:    document.NewModel(cfg),
+		form:   form.New(),
+		doc:    document.New(cfg),
 	}
 }
 

@@ -31,12 +31,12 @@ type Model struct {
 	slackSent        *ui.PublishedSlackMsg
 }
 
-func NewModel(cfg *config.Config) Model {
+func New(cfg *config.Config) Model {
 	return Model{
 		KeyMap: DefaultKeyMap().WithSlack(cfg.SlackChannel != ""),
 		Styles: DefaultStyles(),
 		cfg:    cfg,
-		help:   help.NewModel(),
+		help:   help.New(),
 	}
 }
 

@@ -89,7 +89,7 @@ func run(cmd *cobra.Command, args []string) error {
 
 	log.Printf("rootCmd.run() -- config: %#+v", cfg)
 
-	model := app.NewModel(cfg)
+	model := app.New(cfg)
 
 	if _, err := tea.NewProgram(model).Run(); err != nil {
 		return fmt.Errorf("failed to initialize ui: %w", err)
