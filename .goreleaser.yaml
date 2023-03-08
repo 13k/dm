@@ -15,7 +15,8 @@ builds:
     ldflags:
       - '-w -s -X github.com/13k/dm/meta.Version={{ .Version }} -extldflags "static"'
 archives:
-  - name_template: "{{ .ProjectName }}.{{ .Os }}-{{ .Arch }}"
+  - name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}-{{ .Version }}"
+    rlcp: true
     format_overrides:
       - goos: windows
         format: zip
@@ -25,8 +26,7 @@ release:
   draft: true
   prerelease: auto
 source:
-  enabled: true
-  format: zip
+  enabled: false
 changelog:
   skip: false
   sort: asc
