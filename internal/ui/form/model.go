@@ -31,9 +31,9 @@ type inputConfig struct {
 	defaultValue string
 }
 
-var inputConfigs = make([]*inputConfig, ui.EntriesLen)
+func inputConfigs() []*inputConfig {
+	inputConfigs := make([]*inputConfig, ui.EntriesLen)
 
-func init() {
 	inputConfigs[idxDone] = &inputConfig{
 		prompt:       "1. ",
 		placeholder:  "done",
@@ -51,11 +51,16 @@ func init() {
 		placeholder:  "blks",
 		defaultValue: "none",
 	}
+
+	return inputConfigs
 }
 
+var _ tea.Model = Model{}
+
+//nolint:recvcheck // bubbletea Model interface
 type Model struct {
 	Title  string
-	KeyMap KeyMap
+	KeyMap *KeyMap
 	Styles Styles
 
 	focusIdx int
@@ -78,10 +83,10 @@ func New() Model {
 	var t textinput.Model
 
 	for i := range m.inputs {
-		cfg := inputConfigs[i]
+		cfg := inputConfigs()[i]
 		t = textinput.New()
 
-		t.CursorStyle = m.Styles.Cursor
+		t.Cursor.Style = m.Styles.Cursor
 		t.Prompt = cfg.prompt
 		t.Placeholder = cfg.placeholder
 
@@ -104,7 +109,8 @@ func (m *Model) SetSize(w, _ int) {
 	m.help.Width = w
 }
 
-func (m Model) Init() tea.Cmd { //nolint: gocritic
+//nolint:gocritic // bubbletea Model interface
+func (m Model) Init() tea.Cmd {
 	log.Println("form.Init()")
 
 	return tea.Batch(
@@ -123,7 +129,8 @@ func (m *Model) onDocParsed(entries []string) {
 	}
 }
 
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) { //nolint: gocritic
+//nolint:gocritic,ireturn // bubbletea Model interface
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	log.Printf("form.Update() -- [%T] %v", msg, msg)
 
 	var cmd tea.Cmd
@@ -207,7 +214,7 @@ func (m *Model) submit() tea.Cmd {
 			val := m.inputs[i].Value()
 
 			if val == "" {
-				val = inputConfigs[i].defaultValue
+				val = inputConfigs()[i].defaultValue
 			}
 
 			entries[i] = val
@@ -217,7 +224,8 @@ func (m *Model) submit() tea.Cmd {
 	}
 }
 
-func (m Model) View() string { //nolint: gocritic
+//nolint:gocritic // bubbletea Model interface
+func (m Model) View() string {
 	var b strings.Builder
 
 	b.WriteString(m.formView())

@@ -7,18 +7,18 @@ import (
 	"github.com/13k/dm/internal/ui/form"
 )
 
-var (
-	helpFrameStyle = lipgloss.NewStyle().
-			Margin(1, 1, 0, 1).
-			PaddingTop(1).
-			BorderStyle(lipgloss.NormalBorder()).
-			BorderForeground(lipgloss.AdaptiveColor{
-			Light: "#909090",
-			Dark:  "#626262",
-		}).
-		BorderTop(true)
+type Styles struct {
+	Form         form.Styles
+	Document     document.Styles
+	SuccessFrame lipgloss.Style
+	Success      lipgloss.Style
+	ErrorFrame   lipgloss.Style
+	Error        lipgloss.Style
+	Help         lipgloss.Style
+}
 
-	defaultStyles = Styles{
+func DefaultStyles() Styles {
+	styles := Styles{
 		SuccessFrame: lipgloss.NewStyle().
 			Margin(1).
 			Padding(1),
@@ -43,22 +43,19 @@ var (
 				Dark:  "#626262",
 			}),
 	}
-)
 
-type Styles struct {
-	Form         form.Styles
-	Document     document.Styles
-	SuccessFrame lipgloss.Style
-	Success      lipgloss.Style
-	ErrorFrame   lipgloss.Style
-	Error        lipgloss.Style
-	Help         lipgloss.Style
-}
-
-func DefaultStyles() Styles {
-	styles := defaultStyles
 	docStyles := document.DefaultStyles()
 	formStyles := form.DefaultStyles()
+
+	helpFrameStyle := lipgloss.NewStyle().
+		Margin(1, 1, 0, 1).
+		PaddingTop(1).
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.AdaptiveColor{
+			Light: "#909090",
+			Dark:  "#626262",
+		}).
+		BorderTop(true)
 
 	styles.Document = docStyles
 	styles.Document.HelpFrame = helpFrameStyle

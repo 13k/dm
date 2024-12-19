@@ -13,10 +13,10 @@ func init() {
 
 func onInit() {
 	if err := configureLogger(); err != nil {
-		util.Fatal("failed to configure logger: %v", err)
+		util.Fatalf("failed to configure logger: %v", err)
 	}
 
 	if err := config.LoadFile(); err != nil {
-		util.Fatal("failed to load configuration file: %v", err)
+		util.Fatalf("failed to load configuration file: %v", err)
 	}
 }

@@ -15,10 +15,10 @@ import (
 )
 
 const (
-	slackAuthTokenKey = "slack_auth_token" //nolint:gosec
+	slackAuthTokenKey = "slack_auth_token" //nolint:gosec // it's a key name, not a secret key
 )
 
-func NoopCmd() tea.Msg {
+func NoopCmd() tea.Msg { //nolint:ireturn // bubbletea command func
 	return nil
 }
 
@@ -29,6 +29,7 @@ func ParseDoc(path util.Path) tea.Cmd {
 		f, err := os.Open(path.String())
 		if err != nil {
 			log.Printf("ParseDoc() -- open file error: %v", err)
+
 			return NewErrorMsg(err)
 		}
 
@@ -37,6 +38,7 @@ func ParseDoc(path util.Path) tea.Cmd {
 		src, err := io.ReadAll(f)
 		if err != nil {
 			log.Printf("ParseDoc() -- read error: %v", err)
+
 			return NewErrorMsg(err)
 		}
 
@@ -53,6 +55,7 @@ func ParseDoc(path util.Path) tea.Cmd {
 func RenderDoc(entries []string) tea.Cmd {
 	if len(entries) == 0 {
 		log.Printf("RenderDoc() -- skip create command (empty entries)")
+
 		return nil
 	}
 
@@ -68,6 +71,7 @@ func RenderDoc(entries []string) tea.Cmd {
 		bodyColored, err := markdown.RenderTerm(body)
 		if err != nil {
 			log.Printf("RenderDoc() -- render error: %v", err)
+
 			return NewErrorMsg(err)
 		}
 
@@ -82,9 +86,9 @@ func ClipboardDoc(body string) tea.Cmd {
 
 	return func() tea.Msg {
 		err := clipboard.WriteAll(body)
-
 		if err != nil {
 			log.Printf("ClipboardDoc() -- clipboard write error: %v", err)
+
 			return NewErrorMsg(err)
 		}
 
@@ -97,9 +101,9 @@ func PublishSlackDoc(channel, body string) tea.Cmd {
 
 	return func() tea.Msg {
 		authToken, err := keyring.Get(slackAuthTokenKey)
-
 		if err != nil {
 			log.Printf("PublishSlackDoc() -- keyring error: %v", err)
+
 			return NewErrorMsg(err)
 		}
 
@@ -110,9 +114,9 @@ func PublishSlackDoc(channel, body string) tea.Cmd {
 		}
 
 		resChannel, resTimestamp, err := client.PostMessage(channel, msgOpts...)
-
 		if err != nil {
 			log.Printf("PublishSlackDoc() -- slack error: %v", err)
+
 			return NewErrorMsg(err)
 		}
 
@@ -127,6 +131,7 @@ func WriteDoc(body string, path util.Path) tea.Cmd {
 		f, err := os.Create(path.String())
 		if err != nil {
 			log.Printf("WriteDoc() -- create file error: %v", err)
+
 			return NewErrorMsg(err)
 		}
 
@@ -135,6 +140,7 @@ func WriteDoc(body string, path util.Path) tea.Cmd {
 		n, err := f.WriteString(body)
 		if err != nil {
 			log.Printf("WriteDoc() -- write error: %v", err)
+
 			return NewErrorMsg(err)
 		}
 

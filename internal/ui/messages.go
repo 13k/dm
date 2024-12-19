@@ -2,7 +2,7 @@ package ui
 
 var _ error = (*ErrorMsg)(nil)
 
-type ErrorMsg struct {
+type ErrorMsg struct { //nolint:errname // UI message representing an error
 	Err error
 }
 

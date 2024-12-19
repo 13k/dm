@@ -4,16 +4,11 @@ import (
 	"os"
 )
 
-var (
-	Cwd Path
-)
-
-func init() {
+func Cwd() Path {
 	cwd, err := os.Getwd()
-
 	if err != nil {
-		Fatal("could not determine current working directory: %w", err)
+		Fatalf("could not determine current working directory: %w", err)
 	}
 
-	Cwd = NewPath(cwd)
+	return NewPath(cwd)
 }

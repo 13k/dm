@@ -1,7 +1,6 @@
 package util_test
 
 import (
-	"errors"
 	"io/fs"
 	"strings"
 	"testing"
@@ -32,7 +31,7 @@ func teardownFS() {
 
 func createFile(path util.Path, data []byte, mode fs.FileMode, mtime time.Time) *fstest.MapFile {
 	if path == "" {
-		panic(errors.New("cannot create file with empty name"))
+		panic("cannot create file with empty name")
 	}
 
 	if mode == 0 {
@@ -63,6 +62,7 @@ func touchFile(path util.Path, mtime time.Time) *fstest.MapFile { //nolint:unpar
 }
 
 func TestFindLatestFile(t *testing.T) {
+	t.Parallel()
 	t.Cleanup(teardownFS)
 
 	setupFS()
@@ -102,16 +102,19 @@ func TestFindLatestFile(t *testing.T) {
 		if tc.err == "" {
 			if err != nil {
 				t.Errorf("case #%d: unexpected error: %v", tcidx, err)
+
 				continue
 			}
 		} else {
 			if err == nil {
 				t.Errorf("case #%d: expected error matching %q, actual: nil", tcidx, tc.err)
+
 				continue
 			}
 
 			if !strings.Contains(err.Error(), tc.err) {
 				t.Errorf("case #%d: expected error matching %q, actual: %q", tcidx, tc.err, err.Error())
+
 				continue
 			}
 		}
@@ -119,16 +122,19 @@ func TestFindLatestFile(t *testing.T) {
 		if tc.expected == "" {
 			if actual != nil {
 				t.Errorf("case #%d: expected nil, actual: %q", tcidx, actual.Name())
+
 				continue
 			}
 		} else {
 			if actual == nil {
 				t.Errorf("case #%d: expected: %q, actual: nil", tcidx, tc.expected)
+
 				continue
 			}
 
 			if actual.Name() != tc.expected {
 				t.Errorf("case #%d: expected %q, actual: %q", tcidx, tc.expected, actual.Name())
+
 				continue
 			}
 		}

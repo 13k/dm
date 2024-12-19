@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func Fatal(format string, args ...interface{}) {
+func Fatalf(format string, args ...interface{}) {
 	if !strings.HasSuffix(format, "\n") {
 		format += "\n"
 	}
@@ -18,6 +18,6 @@ func Fatal(format string, args ...interface{}) {
 
 func Must(err error) {
 	if err != nil {
-		Fatal("Error: %v", err)
+		Fatalf("Error: %v", err)
 	}
 }

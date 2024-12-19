@@ -16,7 +16,6 @@ func configureLogger() error {
 	}
 
 	f, err := os.OpenFile(logPath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o666)
-
 	if err != nil {
 		return fmt.Errorf("could not open log file %q: %w", logPath, err)
 	}

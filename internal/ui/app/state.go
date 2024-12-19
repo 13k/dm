@@ -20,6 +20,6 @@ func (s appState) String() string {
 	case stateDocumentSaved:
 		return "document-saved"
 	default:
-		return "<unkown>"
+		return "<unknown>"
 	}
 }

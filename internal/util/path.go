@@ -26,7 +26,6 @@ func (p Path) Join(parts ...string) Path {
 
 func (p Path) Root() (Path, error) {
 	abs, err := filepath.Abs(p.String())
-
 	if err != nil {
 		return "", err
 	}
@@ -47,7 +46,6 @@ func (p Path) IsAbs() bool {
 
 func (p Path) Abs() (Path, error) {
 	abs, err := filepath.Abs(p.String())
-
 	if err != nil {
 		return "", err
 	}
@@ -57,7 +55,6 @@ func (p Path) Abs() (Path, error) {
 
 func (p Path) Rel(parent Path) (Path, error) {
 	rel, err := filepath.Rel(parent.String(), p.String())
-
 	if err != nil {
 		return "", err
 	}
@@ -75,7 +72,6 @@ func (p Path) FS() fs.FS {
 
 func (p Path) IsDir() (bool, error) {
 	fi, err := os.Stat(p.String())
-
 	if err != nil {
 		return false, fmt.Errorf("failed to get filesystem information from %q: %w", p, err)
 	}
@@ -85,20 +81,18 @@ func (p Path) IsDir() (bool, error) {
 
 func (p Path) ReadDir() ([]fs.DirEntry, error) {
 	root, err := p.Root()
-
 	if err != nil {
 		return nil, err
 	}
 
 	fsys := root.FS()
-	rel, err := p.Rel(root)
 
+	rel, err := p.Rel(root)
 	if err != nil {
 		return nil, err
 	}
 
 	entries, err := fs.ReadDir(fsys, rel.String())
-
 	if err != nil {
 		return nil, err
 	}

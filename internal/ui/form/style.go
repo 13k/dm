@@ -4,41 +4,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var defaultStyles = Styles{
-	Frame: lipgloss.NewStyle(),
-	HeaderFrame: lipgloss.NewStyle().
-		Margin(1, 1, 1, 3), //nolint: gomnd
-	Title: lipgloss.NewStyle().
-		Foreground(lipgloss.Color("63")),
-	Date: lipgloss.NewStyle().
-		Foreground(lipgloss.Color("5")),
-	InputsFrame: lipgloss.NewStyle(),
-	FocusedPrompt: lipgloss.NewStyle().
-		Bold(true).
-		Foreground(lipgloss.Color("198")),
-	FocusedText: lipgloss.NewStyle().
-		Foreground(lipgloss.Color("205")),
-	BlurredPrompt: lipgloss.NewStyle().
-		Foreground(lipgloss.NoColor{}),
-	BlurredText: lipgloss.NewStyle().
-		Foreground(lipgloss.AdaptiveColor{
-			Light: "#909090",
-			Dark:  "#828282",
-		}),
-	Cursor: lipgloss.NewStyle().
-		Foreground(lipgloss.Color("205")),
-	ButtonFrame: lipgloss.NewStyle().
-		Margin(1, 1, 1, 2), //nolint: gomnd
-	FocusedButton: lipgloss.NewStyle().
-		Bold(true).
-		Padding(1).
-		Foreground(lipgloss.Color("198")).
-		Background(lipgloss.Color("234")),
-	BlurredButton: lipgloss.NewStyle().
-		Padding(1).
-		Foreground(lipgloss.Color("205")),
-}
-
 type Styles struct {
 	// Widget styles
 	Frame lipgloss.Style
@@ -62,5 +27,38 @@ type Styles struct {
 }
 
 func DefaultStyles() Styles {
-	return defaultStyles
+	return Styles{
+		Frame: lipgloss.NewStyle(),
+		HeaderFrame: lipgloss.NewStyle().
+			Margin(1, 1, 1, 3), //nolint:mnd
+		Title: lipgloss.NewStyle().
+			Foreground(lipgloss.Color("63")),
+		Date: lipgloss.NewStyle().
+			Foreground(lipgloss.Color("5")),
+		InputsFrame: lipgloss.NewStyle(),
+		FocusedPrompt: lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color("198")),
+		FocusedText: lipgloss.NewStyle().
+			Foreground(lipgloss.Color("205")),
+		BlurredPrompt: lipgloss.NewStyle().
+			Foreground(lipgloss.NoColor{}),
+		BlurredText: lipgloss.NewStyle().
+			Foreground(lipgloss.AdaptiveColor{
+				Light: "#909090",
+				Dark:  "#828282",
+			}),
+		Cursor: lipgloss.NewStyle().
+			Foreground(lipgloss.Color("205")),
+		ButtonFrame: lipgloss.NewStyle().
+			Margin(1, 1, 1, 2), //nolint:mnd
+		FocusedButton: lipgloss.NewStyle().
+			Bold(true).
+			Padding(1).
+			Foreground(lipgloss.Color("198")).
+			Background(lipgloss.Color("234")),
+		BlurredButton: lipgloss.NewStyle().
+			Padding(1).
+			Foreground(lipgloss.Color("205")),
+	}
 }

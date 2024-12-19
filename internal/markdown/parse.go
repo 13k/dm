@@ -4,22 +4,18 @@ import (
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/extension"
-	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/text"
 )
 
-var defaultParser parser.Parser
-
-func init() {
-	defaultParser = goldmark.New(
+//nolint:ireturn // must return a Node
+func parseBuffer(buf []byte) ast.Node {
+	parser := goldmark.New(
 		goldmark.WithExtensions(extension.GFM),
 	).Parser()
-}
 
-func parseBuffer(buf []byte) ast.Node {
 	reader := text.NewReader(buf)
 
-	return defaultParser.Parse(reader)
+	return parser.Parse(reader)
 }
 
 // ParseList parses markdown source from the given buffer, finds the first top-level list and
@@ -35,6 +31,7 @@ func ParseList(src []byte) []string {
 	for c := root.FirstChild(); c != nil; c = c.NextSibling() {
 		if c.Kind() == ast.KindList {
 			list = c
+
 			break
 		}
 	}
@@ -59,7 +56,7 @@ func ParseList(src []byte) []string {
 				continue
 			}
 
-			for i := 0; i < itemChild.Lines().Len(); i++ {
+			for i := range itemChild.Lines().Len() {
 				line := itemChild.Lines().At(i)
 				itemSrc = append(itemSrc, line.Value(src)...)
 			}

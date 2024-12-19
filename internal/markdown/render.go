@@ -7,17 +7,9 @@ import (
 	"github.com/charmbracelet/glamour"
 )
 
-const termRenderWidth = 80
-
-var termRenderer *glamour.TermRenderer
-
-func init() {
-	var err error
-
-	if termRenderer, err = newRenderer(termRenderWidth); err != nil {
-		panic(fmt.Errorf("could not create markdown renderer: %w", err))
-	}
-}
+const (
+	termRenderWidth = 80
+)
 
 func newRenderer(width int) (*glamour.TermRenderer, error) {
 	return glamour.NewTermRenderer(
@@ -44,6 +36,11 @@ func RenderList(entries []string) string {
 }
 
 func TermRenderer() *glamour.TermRenderer {
+	termRenderer, err := newRenderer(termRenderWidth)
+	if err != nil {
+		panic(fmt.Errorf("could not create markdown renderer: %w", err))
+	}
+
 	return termRenderer
 }
 

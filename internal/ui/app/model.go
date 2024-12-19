@@ -15,6 +15,7 @@ import (
 
 var _ tea.Model = Model{}
 
+//nolint:recvcheck // bubbletea Model interface requires non-pointer receivers
 type Model struct {
 	Styles Styles
 
@@ -34,7 +35,8 @@ func New(cfg *config.Config) Model {
 	}
 }
 
-func (m Model) Init() tea.Cmd { //nolint: gocritic
+//nolint:gocritic // bubbletea Model interface requires non-pointer receivers
+func (m Model) Init() tea.Cmd {
 	log.Printf("app.Init() -- cfg: %#+v", m.cfg)
 
 	return tea.Batch(
@@ -54,6 +56,7 @@ func (m *Model) loadInput() tea.Cmd {
 
 func (m *Model) stateChange(s appState) {
 	log.Printf("app.stateChange -- %s -> %s", m.state, s)
+
 	m.state = s
 }
 
@@ -91,7 +94,7 @@ func (m *Model) onFormSubmitted(entries []string) tea.Cmd {
 	return ui.RenderDoc(entries)
 }
 
-func (m *Model) onDocRendered(body, bodyColored string) tea.Cmd { //nolint: unparam
+func (m *Model) onDocRendered(body, bodyColored string) tea.Cmd { //nolint:unparam
 	log.Printf(
 		"app.onDocRendered -- body size: %d, colored body size: %d",
 		len(body),
@@ -129,7 +132,8 @@ func (m *Model) onDocSaved() tea.Cmd {
 	return ui.NoopCmd
 }
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) { //nolint: gocritic
+//nolint:cyclop,gocritic,ireturn // bubbletea Model interface // cyclop: switch statement is simple enough
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if msg == nil {
 		return m, nil
 	}
@@ -168,26 +172,38 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) { //nolint: gocritic
 	return m.updateChildren(msg)
 }
 
-func (m *Model) updateChildren(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var cmd tea.Cmd
-
+//nolint:gocritic,ireturn // follows bubbletea Model interface
+func (m Model) updateChildren(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch m.state {
 	case stateShowForm:
-		m.form, cmd = m.form.Update(msg)
+		formModel, cmd := m.form.Update(msg)
+
+		if f, ok := formModel.(form.Model); ok {
+			m.form = f
+		} else {
+			panic("form.Model.Update must return a form.Model instance")
+		}
 
 		return m, cmd
 	case stateShowDocument:
-		m.doc, cmd = m.doc.Update(msg)
+		docModel, cmd := m.doc.Update(msg)
+
+		if d, ok := docModel.(document.Model); ok {
+			m.doc = d
+		} else {
+			panic("document.Model.Update must return a document.Model instance")
+		}
 
 		return m, cmd
 	case stateError, stateDocumentSaved:
 		return m, nil
 	default:
-		panic(fmt.Errorf("unknown app state %#+v", m.state))
+		panic(fmt.Sprintf("unknown app state %#+v", m.state))
 	}
 }
 
-func (m Model) View() string { //nolint: gocritic
+//nolint:gocritic // bubbletea Model interface
+func (m Model) View() string {
 	switch m.state {
 	case stateShowForm:
 		m.form.Styles = m.Styles.Form
@@ -202,7 +218,7 @@ func (m Model) View() string { //nolint: gocritic
 	case stateDocumentSaved:
 		return m.successView()
 	default:
-		panic(fmt.Errorf("unknown app state %#+v", m.state))
+		panic(fmt.Sprintf("unknown app state %#+v", m.state))
 	}
 }
 

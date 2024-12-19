@@ -18,9 +18,12 @@ const (
 	iconSlack     = "📨"
 )
 
+var _ tea.Model = Model{}
+
+//nolint:recvcheck // bubbletea Model interface
 type Model struct {
 	Styles Styles
-	KeyMap KeyMap
+	KeyMap *KeyMap
 
 	cfg  *config.Config
 	help help.Model
@@ -44,13 +47,15 @@ func (m *Model) SetSize(w, _ int) {
 	m.help.Width = w
 }
 
-func (m Model) Init() tea.Cmd { //nolint: gocritic
+//nolint:gocritic // bubbletea Model interface
+func (m Model) Init() tea.Cmd {
 	log.Println("document.Init()")
 
 	return nil
 }
 
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) { //nolint: gocritic
+//nolint:gocritic,ireturn // bubbletea Model interface
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	log.Printf("document.Update() -- [%T] %v", msg, msg)
 
 	var cmd tea.Cmd
@@ -97,7 +102,8 @@ func (m *Model) save() tea.Cmd {
 	}
 }
 
-func (m Model) View() string { //nolint: gocritic
+//nolint:gocritic // bubbletea Model interface
+func (m Model) View() string {
 	var b strings.Builder
 
 	b.WriteString(m.bodyView())
@@ -117,7 +123,7 @@ func (m *Model) messageView() string {
 	var b strings.Builder
 
 	if m.clipboardWritten != nil {
-		msg := fmt.Sprintf("%s  copied to the clipboard", iconClipboard)
+		msg := iconClipboard + "  copied to the clipboard"
 
 		b.WriteString(m.Styles.Message.Render(msg))
 		b.WriteRune('\n')

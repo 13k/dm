@@ -1,6 +1,7 @@
 package util
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"sort"
@@ -11,7 +12,13 @@ import (
 	"github.com/13k/dm/internal/markdown"
 )
 
-var testFs fs.FS // for testing
+var testFs fs.FS //nolint:gochecknoglobals // Used in tests
+
+var (
+	ErrAbsPathRequired       = errors.New("absolute path is required")
+	ErrInvalidLatestFileMode = errors.New("invalid latest file mode")
+	ErrFileNotFound          = errors.New("file not found")
+)
 
 const (
 	latestFileModeLowerBound LatestFileMode = iota - 1
@@ -30,7 +37,7 @@ func LatestFileModeFromString(s string) (LatestFileMode, error) {
 		return LatestFileByModTime, nil
 	}
 
-	return latestFileModeLowerBound, fmt.Errorf("invalid latest file mode %q", s)
+	return latestFileModeLowerBound, fmt.Errorf("%w: %q", ErrInvalidLatestFileMode, s)
 }
 
 func (m LatestFileMode) String() string {
@@ -47,7 +54,7 @@ func (m LatestFileMode) String() string {
 
 func FindLatestFile(dir Path, mode LatestFileMode, exts []string) (fs.FileInfo, error) {
 	if mode <= latestFileModeLowerBound || mode >= latestFileModeUpperBound {
-		return nil, fmt.Errorf("invalid latest file mode (%v)", mode)
+		return nil, fmt.Errorf("%w: %v", ErrInvalidLatestFileMode, mode)
 	}
 
 	infos, err := readDirInfos(dir)
@@ -61,7 +68,7 @@ func FindLatestFile(dir Path, mode LatestFileMode, exts []string) (fs.FileInfo, 
 	}
 
 	if len(infos) == 0 {
-		return nil, nil
+		return nil, nil //nolint:nilnil // Valid optional return value
 	}
 
 	sortFileInfosByLatest(infos, mode)
@@ -71,11 +78,10 @@ func FindLatestFile(dir Path, mode LatestFileMode, exts []string) (fs.FileInfo, 
 
 func readDirInfos(dir Path) ([]fs.FileInfo, error) {
 	if !dir.IsAbs() {
-		return nil, fmt.Errorf("dir is not absolute: %q", dir)
+		return nil, fmt.Errorf("%w: %q", ErrAbsPathRequired, dir)
 	}
 
 	entries, err := dir.ReadDir()
-
 	if err != nil {
 		return nil, err
 	}
@@ -97,10 +103,12 @@ func filterFileInfosByExts(infos []fs.FileInfo, exts []string) ([]fs.FileInfo, e
 		return infos, nil
 	}
 
-	var filtered []fs.FileInfo
+	var (
+		filtered []fs.FileInfo
 
-	pattern := fmt.Sprintf("*.{%s}", strings.Join(exts, ","))
-	g, err := glob.Compile(pattern)
+		pattern = fmt.Sprintf("*.{%s}", strings.Join(exts, ","))
+		g, err  = glob.Compile(pattern)
+	)
 
 	if err != nil {
 		return nil, fmt.Errorf("error compiling glob pattern %q: %w", pattern, err)
@@ -132,13 +140,12 @@ func sortFileInfosByLatest(infos []fs.FileInfo, mode LatestFileMode) {
 
 func SearchLatestDocumentFile(dir Path, mode LatestFileMode) (Path, error) {
 	latestInfo, err := FindLatestFile(dir, mode, markdown.Extensions)
-
 	if err != nil {
 		return "", fmt.Errorf("failed to find latest document file in directory %q: %w", dir, err)
 	}
 
 	if latestInfo == nil {
-		return "", fmt.Errorf("could not find any latest document file by %s in directory %q", mode, dir)
+		return "", fmt.Errorf("failed to find latest document file by %s in directory %q: %w", mode, dir, ErrFileNotFound)
 	}
 
 	latestPath := dir.Join(latestInfo.Name())

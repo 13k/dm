@@ -80,9 +80,8 @@ If output is a directory, the output file is "<output>/<current_date>.md".
 	return cmd
 }
 
-func run(cmd *cobra.Command, args []string) error {
+func run(_ *cobra.Command, _ []string) error {
 	cfg, err := config.New()
-
 	if err != nil {
 		return fmt.Errorf("failed to create configuration: %w", err)
 	}

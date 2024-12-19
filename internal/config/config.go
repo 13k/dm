@@ -13,17 +13,12 @@ import (
 	"github.com/13k/dm/meta"
 )
 
-var (
-	defaultConfigDir      string
-	defaultOutputFilename string
-	defaultOutputPath     string
-	defaultLatestMode     string = util.LatestFileByName.String()
-)
+var ErrConfig = errors.New("configuration error")
 
 func init() {
-	defaultConfigDir = filepath.Join(xdg.ConfigHome, meta.AppName)
-	defaultOutputFilename = fmt.Sprintf("%s.md", util.TodayString())
-	defaultOutputPath = util.Cwd.String()
+	defaultConfigDir := filepath.Join(xdg.ConfigHome, meta.AppName)
+	defaultOutputPath := util.Cwd().String()
+	defaultLatestMode := util.LatestFileByName.String()
 
 	viper.AddConfigPath(defaultConfigDir)
 	viper.SetConfigName("config")
@@ -58,7 +53,7 @@ type Config struct {
 	LatestBy util.LatestFileMode
 }
 
-func New() (*Config, error) { //nolint: funlen
+func New() (*Config, error) { //nolint:cyclop,funlen
 	cfg := &Config{
 		InputPath:    util.NewPath(viper.GetString("input_path")),
 		OutputPath:   util.NewPath(viper.GetString("output_path")),
@@ -73,22 +68,20 @@ func New() (*Config, error) { //nolint: funlen
 	)
 
 	if cfg.OutputPath == "" {
-		return nil, fmt.Errorf("output path cannot be empty")
+		return nil, fmt.Errorf("%w: output path cannot be empty", ErrConfig)
 	}
 
 	cfg.LatestBy, err = util.LatestFileModeFromString(cfg.LatestMode)
-
 	if err != nil {
 		return nil, err
 	}
 
 	if cfg.InputPath == "" && cfg.Latest {
-		cfg.InputPath = util.Cwd
+		cfg.InputPath = util.Cwd()
 	}
 
 	if cfg.InputPath != "" {
 		cfg.InputPath, err = cfg.InputPath.Abs()
-
 		if err != nil {
 			return nil, err
 		}
@@ -96,14 +89,12 @@ func New() (*Config, error) { //nolint: funlen
 
 	if cfg.InputPath != "" {
 		isDir, err = cfg.InputPath.IsDir()
-
 		if err != nil {
 			return nil, err
 		}
 
 		if isDir {
 			cfg.InputPath, err = util.SearchLatestDocumentFile(cfg.InputPath, cfg.LatestBy)
-
 			if err != nil {
 				return nil, err
 			}
@@ -111,16 +102,15 @@ func New() (*Config, error) { //nolint: funlen
 	}
 
 	isDir, err = cfg.OutputPath.IsDir()
-
 	if err != nil {
 		return nil, err
 	}
 
 	if isDir {
+		defaultOutputFilename := util.TodayString() + ".md"
 		cfg.OutputPath = cfg.OutputPath.Join(defaultOutputFilename)
 	} else {
 		cfg.OutputPath, err = cfg.OutputPath.Abs()
-
 		if err != nil {
 			return nil, err
 		}
