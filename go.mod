@@ -21,14 +21,11 @@ require (
 
 require (
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
-	github.com/alecthomas/chroma v0.10.0 // indirect
 	github.com/alecthomas/chroma/v2 v2.14.0 // indirect
-	github.com/aymanbagabas/go-osc52 v1.2.1 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/charmbracelet/x/ansi v0.6.0 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
-	github.com/containerd/console v1.0.3 // indirect
 	github.com/danieljoos/wincred v1.2.2 // indirect
 	github.com/dlclark/regexp2 v1.11.4 // indirect
 	github.com/dvsekhvalnov/jose2go v1.8.0 // indirect
@@ -52,7 +49,6 @@ require (
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.15.3-0.20240618155329-98d742f6907a // indirect
-	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/sagikazarmark/locafero v0.6.0 // indirect
@@ -60,11 +56,9 @@ require (
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
-	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/yuin/goldmark-emoji v1.0.4 // indirect
-	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
 	golang.org/x/net v0.33.0 // indirect
