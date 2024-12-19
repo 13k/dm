@@ -85,7 +85,7 @@ func TestFindLatestFile(t *testing.T) {
 	}{
 		{rootTestFS, util.LatestFileMode(-1), nil, "", "invalid latest file mode"},
 		{rootTestFS, util.LatestFileMode(666), nil, "", "invalid latest file mode"},
-		{"invalid", util.LatestFileByName, nil, "", "is not absolute"},
+		{"invalid", util.LatestFileByName, nil, "", "absolute path is required"},
 		{rootTestFS.Join("invalid"), util.LatestFileByName, nil, "", "file does not exist"},
 		{rootTestFS, util.LatestFileByName, []string{"[1-]"}, "", "pattern"},
 		{rootTestFS, util.LatestFileByModTime, []string{"invalid"}, "", ""},
